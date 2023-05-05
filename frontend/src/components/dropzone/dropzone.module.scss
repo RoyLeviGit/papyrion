@@ -1,0 +1,19 @@
+.root {
+  position: relative;
+  width: 196px;
+  overflow: scroll;
+  &:hover {
+    background-color: rgba(0, 0, 0, 0.1);
+  }
+  border-image: linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0) 0%,
+      #9e3abf 50%,
+      rgba(255, 255, 255, 0) 100%
+    )
+    1 / 2px stretch;
+  padding-top: 2px;
+  padding-right: 2px;
+  padding-bottom: 2px;
+  margin: 4px;
+}
