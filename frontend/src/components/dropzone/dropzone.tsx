@@ -1,4 +1,5 @@
-import React, { useEffect, useRef } from 'react';
+import { useEffect, useRef } from 'react';
+import Cookies from 'js-cookie';
 import Dz from 'dropzone';
 
 import 'dropzone/dist/dropzone.css';
@@ -17,9 +18,12 @@ export const Dropzone = ({ className, text }: DropzoneProps) => {
     useEffect(() => {
         if (dropzoneRef.current) {
             const dropzone = new Dz(dropzoneRef.current, {
-                url: '/upload/post',
+                url: `${import.meta.env.VITE_API_URL}/upload`,
                 dictDefaultMessage:
                     text || "Drag 'n' drop some files here, or click to select files",
+                headers: {
+                    Authorization: `Bearer ${Cookies.get('token')}`,
+                },
             });
 
             return () => {

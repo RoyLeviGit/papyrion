@@ -1,7 +1,7 @@
 .root {
-  position: relative;
-  width: 196px;
-  overflow: scroll;
+  display: flex;
+  flex-direction: column;
+  overflow: auto;
   &:hover {
     background-color: rgba(0, 0, 0, 0.1);
   }
@@ -12,8 +12,5 @@
       rgba(255, 255, 255, 0) 100%
     )
     1 / 2px stretch;
-  padding-top: 2px;
-  padding-right: 2px;
-  padding-bottom: 2px;
   margin: 4px;
 }

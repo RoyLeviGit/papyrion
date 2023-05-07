@@ -1,15 +1,19 @@
-import { useState } from 'react';
 import classNames from 'classnames';
-import { ReactComponent as ReactLogo } from './assets/react.svg';
-import { ReactComponent as ViteLogo } from './assets/vite.svg';
-import { ReactComponent as TypescriptLogo } from './assets/typescript.svg';
-import { ReactComponent as ScssLogo } from './assets/scss.svg';
 import styles from './App.module.scss';
 import { Dropzone } from './components/dropzone/dropzone';
 import { MultiChat } from './components/multi-chat/multi-chat';
+import Cookies from 'js-cookie';
 
 function App() {
-    const [count, setCount] = useState(0);
+    fetch(`${import.meta.env.VITE_API_URL}/login`)
+    .then(response => response.json())
+    .then(data => {
+        const token = data.token;
+        Cookies.set('token', token);
+    })
+    .catch(error => {
+           console.error('Error fetching token:', error);
+        });
 
     return (
         <div className={styles.App}>
