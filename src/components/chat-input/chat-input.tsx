@@ -3,17 +3,14 @@ import styles from './chat-input.module.scss';
 
 export interface ChatInputProps {
     className?: string;
+    text?: string;
 }
 
-/**
- * This component was created using Codux's Default new component template.
- * To create custom component templates, see https://help.codux.com/kb/en/article/configuration-for-chat-inputs-and-templates
- */
-export const ChatInput = ({ className }: ChatInputProps) => {
+export const ChatInput = ({ className, text }: ChatInputProps) => {
     return (
         <div className={classNames(styles.root, className)}>
+            <textarea className={styles.inputarea} value={text} placeholder={"Enter your message for answers from uploaded docs or click a document to generate questions! ✨"}></textarea>
             <button>✅</button>
-            <textarea className={styles.inputarea}></textarea>
         </div>
     );
 };

@@ -1,11 +1,11 @@
 .root {
   display: flex;
   flex-direction: column;
-  background-color: rgba(255, 255, 255, 0);
+  background-color: rgba(255, 255, 255, 0.1);
   margin: 5px;
   font-size: 16px;
   overflow: auto;
-  height: 100%;
+  padding: 0px;
 }
 
 code[class*='language-'] {
