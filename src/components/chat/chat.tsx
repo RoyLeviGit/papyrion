@@ -13,7 +13,7 @@ export interface ChatProps {
 export const Chat = ({ className }: ChatProps) => {
     return (
         <div className={classNames(styles.root, className)}>
-            <textarea className={classNames(styles.textarea, styles.outputarea)} />
+            <textarea className={classNames(styles.outputarea)} />
             <ChatInput />
         </div>
     );
