@@ -1,6 +1,7 @@
 import classNames from 'classnames';
 import styles from './chat.module.scss';
 import { ChatInput } from '../chat-input/chat-input';
+import { FormattedText } from '../formatted-text/formatted-text';
 
 export interface ChatProps {
     className?: string;
@@ -13,7 +14,7 @@ export interface ChatProps {
 export const Chat = ({ className }: ChatProps) => {
     return (
         <div className={classNames(styles.root, className)}>
-            <textarea className={classNames(styles.outputarea)} />
+            <FormattedText />
             <ChatInput />
         </div>
     );
