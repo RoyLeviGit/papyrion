@@ -25,25 +25,6 @@ const CodeBlock = ({ language, value }: any) => {
     );
 };
 
-var textFromGPT = `
-# This is a Markdown heading
-
-This is a paragraph with some *italic* and **bold** text.
-
-Here's some inline math: $\\int_0^\\infty e^{-x^2} dx = \\frac{\\sqrt{\\pi}}{2}$
-
-Here's a code snippet:
-
-\`\`\`javascript
-function add(a, b) {
-  return a + b;
-}
-\`\`\`
-  `;
-for (var i = 0; i < 4; i++) {
-    textFromGPT += textFromGPT;
-}
-
 export interface FormattedTextProps {
     className?: string;
     text?: string;
@@ -55,7 +36,7 @@ export const FormattedText = ({ className, text }: FormattedTextProps) => {
             <ReactMarkdown
                 remarkPlugins={[remarkMath]}
                 rehypePlugins={[rehypeKatex]}
-                children={text || textFromGPT}
+                children={text || ''}
                 components={{
                     code({ node, inline, className, children, ...props }) {
                         const match = /language-(\w+)/.exec(className || '');

@@ -22,10 +22,14 @@ export const Dropzone = ({ className, text, selectedFile, setSelectedFile }: Dro
 
     // Serverside fetch files
     useEffect(() => {
-        fetch(`${import.meta.env.VITE_API_URL}api/list-files`, {
-            headers: {
-                Authorization: `Bearer ${Cookies.get('token')}`,
-            },
+        if (!Cookies.get('access_token')) {
+            return;
+        }
+
+        fetch(`http://${import.meta.env.VITE_API_URL}/list-files`, {
+            // headers: {
+            //     Authorization: `Bearer ${Cookies.get('access_token')}`,
+            // },
         })
         .then((response) => response.json())
         .then((data) => {
@@ -34,7 +38,7 @@ export const Dropzone = ({ className, text, selectedFile, setSelectedFile }: Dro
         .catch((error) => {
             if (error.status === 404 || error.status === 422) {
                 // Token expired
-                Cookies.remove('token');
+                Cookies.remove('access_token');
                 window.location.reload();
             }
         });
@@ -45,12 +49,12 @@ export const Dropzone = ({ className, text, selectedFile, setSelectedFile }: Dro
         if (dropzoneRef.current) {
             Dz.autoDiscover = false;
             const dropzone = new Dz(dropzoneRef.current, {
-                url: `${import.meta.env.VITE_API_URL}api/upload`,
+                url: `http://${import.meta.env.VITE_API_URL}/upload`,
                 dictDefaultMessage:
                     text || "Drag 'n' drop some files here, or click to select files",
-                headers: {
-                    Authorization: `Bearer ${Cookies.get('token')}`,
-                },
+                // headers: {
+                //     Authorization: `Bearer ${Cookies.get('access_token')}`,
+                // },
                 parallelUploads: 1,
             });
             dropzone.on('addedfile', (file) => {
@@ -78,11 +82,15 @@ export const Dropzone = ({ className, text, selectedFile, setSelectedFile }: Dro
     }, [fetchedFiles]);
 
     const onResetClick = () => {
-        fetch(`${import.meta.env.VITE_API_URL}api/delete-files`, {
+        if (!Cookies.get('access_token')) {
+            return;
+        }
+        
+        fetch(`http://${import.meta.env.VITE_API_URL}/delete-files`, {
             method: 'POST',
-            headers: {
-                Authorization: `Bearer ${Cookies.get('token')}`,
-            },
+            // headers: {
+            //     Authorization: `Bearer ${Cookies.get('access_token')}`,
+            // },
         })
         .then((response) => {
             if (response.status === 200) {
@@ -92,7 +100,7 @@ export const Dropzone = ({ className, text, selectedFile, setSelectedFile }: Dro
         .catch((error) => {
             if (error.status === 404 || error.status === 422) {
                 // Token expired
-                Cookies.remove('token');
+                Cookies.remove('access_token');
                 window.location.reload();
             }
         });

@@ -4,12 +4,26 @@ import styles from './App.module.scss';
 import { Dropzone } from './components/dropzone/dropzone';
 import { MultiChat } from './components/multi-chat/multi-chat';
 import Cookies from 'js-cookie';
-import { fetchEventSource, EventStreamContentType } from '@microsoft/fetch-event-source';
-import { Socket, io } from "socket.io-client";
+import { ChatMessage } from './components/chat/chat'
 
+var textFromGPT = `
+## This is a Markdown heading
+
+This is a paragraph with some *italic* and **bold** text.
+
+Here's some inline math: $\\int_0^\\infty e^{-x^2} dx = \\frac{\\sqrt{\\pi}}{2}$
+
+Here's a code snippet:
+
+\`\`\`javascript
+function add(a, b) {
+  return a + b;
+}
+\`\`\`
+  `;
 
 function App() {
-    const [socket, setSocket] = useState<Socket>();
+    const [socket, setSocket] = useState<WebSocket>();
     const [status, setStatus] = useState({
         status: 'initial',
         description: 'Ready to chat! Please upload files and let\'s begin!'
@@ -17,49 +31,82 @@ function App() {
 
     // Dropzone selected item
     const [selectedFile, setSelectedFile] = useState<string>('');
+    const [chatMessages, setChatMessages] = useState<ChatMessage[]>([
+        { id: -2, ai: true, message: textFromGPT },
+        { id: -1, ai: false, message: textFromGPT },
+    ]);
 
     useEffect(() => {
         // Handle token refresh
         const getNewToken = () => {
-            Cookies.remove('token');
+            Cookies.remove('access_token');
             console.log('Getting new token');
-            fetch(`${import.meta.env.VITE_API_URL}api/login`)
+            fetch(`http://${import.meta.env.VITE_API_URL}/auth`)
             .then(response => response.json())
             .then(data => {
                 console.log(data);
-                Cookies.set('token', data.token);
+                Cookies.set('access_token', data.access_token);
+                window.location.reload();
             })
             .catch(error => {
-                console.error('Error fetching token:', error);
+                console.error('Error fetching access_token:', error);
             });    
         }
-        if (Cookies.get('token')) {
-            fetch(`${import.meta.env.VITE_API_URL}api/check-token`, {
-                headers: {
-                'Authorization': `Bearer ${Cookies.get('token')}`
-                }
-            })
-            .then(response => {
-                if (response.status === 200) {
-                    return;
-                }
-                getNewToken()
-            })
-            .catch(error => {
-                console.error('An error occurred while checking the token:', error);
-                getNewToken()
-            })
+        if (Cookies.get('access_token')) {
+            console.log(`Got access_token ${Cookies.get('access_token')}`);
+            // fetch(`http://${import.meta.env.VITE_API_URL}/refresh`, {
+            //     method: 'POST',
+            //     headers: {
+            //     'Authorization': `Bearer ${Cookies.get('access_token')}`
+            //     }
+            // })
+            // .then(response => {
+            //     if (response.status === 200) {
+            //         return;
+            //     }
+            // })
+            // .catch(error => {
+            //     console.error('An error occurred while checking the token:', error);
+            //     getNewToken()
+            // })
         } else {
             getNewToken()
         }
     }, []);
 
     useEffect(() => {
-         const newSocket = io(`${import.meta.env.VITE_API_URL}`,  {
-            extraHeaders: {
-                'Authorization': `Bearer ${Cookies.get('token')}`
-            },
-        });
+        if (!Cookies.get('access_token')) {
+            return;
+        }
+
+        console.log(Cookies.get('access_token'))
+
+        const newSocket = new WebSocket(`ws://${import.meta.env.VITE_API_URL}/chat`);//,  //{
+            // extraHeaders: {
+            //     'Authorization': `Bearer ${Cookies.get('access_token')}`
+            // },
+        //});
+        newSocket.onmessage = (event: any) => {
+            const data = JSON.parse(event.data);
+            console.log("Wierd1")
+
+            setChatMessages((prevMessages) => {
+                console.log("Wierd");
+                const updatedMessages = [...prevMessages];
+                if (updatedMessages.length > 0)
+                  updatedMessages[updatedMessages.length - 1].message += data.token;
+                else
+                  updatedMessages.push({ id: new Date().getTime(), ai: false, message: data.token });
+            
+                if (data.delimeter) {
+                  // Start a new message
+                  updatedMessages.push({ id: new Date().getTime(), ai: false, message: "" });
+                }
+            
+                return updatedMessages;
+            });
+        }
+
         setSocket(newSocket);
     
         return () => {
@@ -73,36 +120,20 @@ function App() {
             status: "questioning",
             description: `Questioning file ${selectedFile}...`,
           });
-      
-          // Add a listener for the "question_response" event
-          const handleQuestionResponse = (data: any) => {
-            console.log('Sending question request');
-            console.log(data);
-            const questions = data;
-          };
-      
+            
           if (socket) {
-            socket.on(`question_response_${selectedFile}`, handleQuestionResponse);
-            // Send the question request
+            // // Send the question request
             console.log('Sending question request');
-            socket.emit("api/question", {
-                document_id:  selectedFile,
-                token: Cookies.get('token'),
-            });
+            socket.send(JSON.stringify({"type": "question_doc", "document_id": selectedFile}));
           }
-      
-          return () => {
-            if (socket) {
-              socket.off(`question_response_${selectedFile}`, handleQuestionResponse);
-            }
-          };
         }
+        return () => {};
       }, [selectedFile, socket]);
 
     return (
         <div className={styles.App}>
             <Dropzone text="📜" className={styles.dropzone} selectedFile={selectedFile} setSelectedFile={setSelectedFile} />
-            <MultiChat status={status.description} />
+            <MultiChat status={status.description} chatMessages={chatMessages}/>
         </div>
     );
 }

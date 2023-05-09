@@ -4,6 +4,7 @@ import { ChatInput } from '../chat-input/chat-input';
 import { FormattedText } from '../formatted-text/formatted-text';
 
 export interface ChatMessage {
+    id: number;
     ai: boolean;
     message: string;
 }
@@ -14,24 +15,16 @@ export interface ChatProps {
 }
 
 export const Chat = ({ className, chatMessages }: ChatProps) => {
-    // Add empty message if no messages
-    if (!chatMessages) {
-        chatMessages = [{ ai: true, message: 'sdfg' }, { ai: false, message: 'fdsv' }];
-    }
     // String together chat messages
-    const formattedChatMessages = chatMessages?.map(message => {
+    const formattedChatMessages = chatMessages?.map((message) => {
         return (
-            <div className={classNames(styles.message, message.ai ? styles.ai : styles.user)}>
-                <FormattedText text={message.message} />
-            </div>
+            <FormattedText className={classNames(styles.message, message.ai ? styles.ai : styles.human)} text={message.message} key={message.id}/>
         );
     });
-    
-
 
     return (
         <div className={classNames(styles.root, className)}>
-            {formattedChatMessages}
+            <div className={styles['formated-text-area']}>{formattedChatMessages}</div>
             <ChatInput />
         </div>
     );

@@ -3,9 +3,19 @@
   flex-grow: 1;
   flex-shrink: 1;
   flex-direction: column;
+  bottom: 0px;
   overflow: auto;
   height: 100%;
-  position: sticky;
-  bottom: 0px;
-  width: 100%;
+}
+.message {
+  background-color: rgba(255, 255, 255, 0);
+}
+.ai {
+  background-color: rgba(162, 0, 168, 0.1);
+}
+.human {
+  background-color: rgba(14, 132, 136, 0.1);
+}
+.formated-text-area {
+  overflow: auto;
 }
