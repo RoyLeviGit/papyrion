@@ -4,7 +4,7 @@ import { ChatInput } from '../chat-input/chat-input';
 import { FormattedText } from '../formatted-text/formatted-text';
 
 export interface ChatMessage {
-    id: number;
+    id: string;
     ai: boolean;
     message: string;
 }

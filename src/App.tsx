@@ -5,6 +5,7 @@ import { Dropzone } from './components/dropzone/dropzone';
 import { MultiChat } from './components/multi-chat/multi-chat';
 import Cookies from 'js-cookie';
 import { ChatMessage } from './components/chat/chat'
+import { v4 as uuidv4 } from 'uuid';
 
 var textFromGPT = `
 ## This is a Markdown heading
@@ -88,26 +89,33 @@ function App() {
         //});
         newSocket.onmessage = (event: any) => {
             const data = JSON.parse(event.data);
-            console.log("Wierd1")
+            const type = data.type
+            const message = data.message
+            console.log(message)
 
-            setChatMessages((prevMessages) => {
-                console.log("Wierd");
-                const updatedMessages = [...prevMessages];
-                if (updatedMessages.length > 0)
-                  updatedMessages[updatedMessages.length - 1].message += data.token;
-                else
-                  updatedMessages.push({ id: new Date().getTime(), ai: false, message: data.token });
+            if (type == "new_token") {
+                setChatMessages((prevMessages) => {
+                    const updatedMessages = [...prevMessages];
+                    if (updatedMessages.length > 0)
+                      updatedMessages[updatedMessages.length - 1].message += message.token;
+                    else
+                      updatedMessages.push({ id: uuidv4(), ai: false, message: message.token });
+        
+                    if (message.delimiter) {
+                        updatedMessages.push({ id: uuidv4(), ai: true, message: "" });
+
+                        // Start a new message
+                        updatedMessages.push({ id: uuidv4(), ai: false, message: "" });
+                    }
             
-                if (data.delimeter) {
-                  // Start a new message
-                  updatedMessages.push({ id: new Date().getTime(), ai: false, message: "" });
-                }
-            
-                return updatedMessages;
-            });
+                    return updatedMessages;
+                });
+    
+            }
         }
-
-        setSocket(newSocket);
+        newSocket.onopen = () => {
+            setSocket(newSocket);
+        }
     
         return () => {
             newSocket.close();
