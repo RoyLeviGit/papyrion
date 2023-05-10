@@ -33,8 +33,8 @@ function App() {
     // Dropzone selected item
     const [selectedFile, setSelectedFile] = useState<string>('');
     const [chatMessages, setChatMessages] = useState<ChatMessage[]>([
-        { id: -2, ai: true, message: textFromGPT },
-        { id: -1, ai: false, message: textFromGPT },
+        { id: "-2", ai: true, message: textFromGPT },
+        { id: "-1", ai: false, message: textFromGPT },
     ]);
 
     useEffect(() => {
@@ -76,67 +76,79 @@ function App() {
     }, []);
 
     useEffect(() => {
-        if (!Cookies.get('access_token')) {
-            return;
-        }
-
-        console.log(Cookies.get('access_token'))
-
-        const newSocket = new WebSocket(`ws://${import.meta.env.VITE_API_URL}/chat`);//,  //{
-            // extraHeaders: {
-            //     'Authorization': `Bearer ${Cookies.get('access_token')}`
-            // },
-        //});
-        newSocket.onmessage = (event: any) => {
-            const data = JSON.parse(event.data);
-            const type = data.type
-            const message = data.message
-            console.log(message)
-
-            if (type == "new_token") {
-                setChatMessages((prevMessages) => {
-                    const updatedMessages = [...prevMessages];
-                    if (updatedMessages.length > 0)
-                      updatedMessages[updatedMessages.length - 1].message += message.token;
-                    else
-                      updatedMessages.push({ id: uuidv4(), ai: false, message: message.token });
-        
-                    if (message.delimiter) {
-                        updatedMessages.push({ id: uuidv4(), ai: true, message: "" });
-
-                        // Start a new message
-                        updatedMessages.push({ id: uuidv4(), ai: false, message: "" });
-                    }
-            
-                    return updatedMessages;
-                });
-    
-            }
-        }
-        newSocket.onopen = () => {
-            setSocket(newSocket);
-        }
-    
-        return () => {
-            newSocket.close();
-        };
-    }, []);
-
-    useEffect(() => {
         if (selectedFile && status.status !== "questioning") {
-          setStatus({
-            status: "questioning",
-            description: `Questioning file ${selectedFile}...`,
-          });
-            
-          if (socket) {
-            // // Send the question request
+            setStatus({
+                status: "questioning",
+                description: `Questioning file ${selectedFile}...`,
+            });
+
             console.log('Sending question request');
-            socket.send(JSON.stringify({"type": "question_doc", "document_id": selectedFile}));
-          }
+            fetch(`http://${import.meta.env.VITE_API_URL}/question_doc`, {
+                method: 'POST',
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    document_id: selectedFile
+                })
+            }).then(response => {
+                console.log(response);
+                if (response.body) {
+                    const reader = response.body.getReader()
+                    console.log(reader); 
+                    const decoder = new TextDecoder('utf-8');
+                    const readData = async () => {
+                        try {
+                          while (true) {
+                            const { done, value } = await reader.read();
+                            if (done) {
+                              break;
+                            }
+                            // process the data
+                            const decodedValue = decoder.decode(value)
+                            console.log(decodedValue);
+                            // Check if the chunks start with "data: " and remove it if necessary
+                            const dataPrefix = 'data: ';
+                            const jsonValue = decodedValue.startsWith(dataPrefix) ? decodedValue.slice(dataPrefix.length) : decodedValue;
+                            try {
+                                const json = JSON.parse(jsonValue)
+                                console.log(json)   
+                                const data = json.data;
+
+                                setChatMessages((prevMessages) => {
+                                    const updatedMessages = [...prevMessages];
+                                    if (updatedMessages.length > 0)
+                                      updatedMessages[updatedMessages.length - 1].message += data.token;
+                                    else
+                                      updatedMessages.push({ id: uuidv4(), ai: false, message: data.token });
+                        
+                                    if (data.delimiter) {
+                                        updatedMessages.push({ id: uuidv4(), ai: true, message: "" });
+                
+                                        // Start a new message
+                                        updatedMessages.push({ id: uuidv4(), ai: false, message: "" });
+                                    }
+                            
+                                    return updatedMessages;
+                                });     
+                            } catch(error) {
+                                console.error(`Error parsing data: ${error}`);
+                                continue
+                            }
+                          }
+                        } catch (error) {
+                          console.error(`Error reading data: ${error}`);
+                        } finally {
+                          reader.releaseLock();
+                        }    
+                    };
+                    readData()
+                }     
+            }).catch((e) => {
+                console.log(e);
+            })
         }
-        return () => {};
-      }, [selectedFile, socket]);
+      }, [selectedFile]);
 
     return (
         <div className={styles.App}>
