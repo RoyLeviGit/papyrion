@@ -1,3 +1,4 @@
+import { Dispatch, SetStateAction } from 'react';
 import classNames from 'classnames';
 import styles from './chat.module.scss';
 import { ChatInput } from '../chat-input/chat-input';
@@ -13,9 +14,11 @@ export interface ChatMessage {
 export interface ChatProps {
     className?: string;
     chatMessages?: ChatMessage[];
+    setChatMessages: Dispatch<SetStateAction<ChatMessage[]>>;
+    sefFillAiMessages: Dispatch<SetStateAction<string[]>>;
 }
 
-export const Chat = ({ className, chatMessages }: ChatProps) => {
+export const Chat = ({ className, chatMessages, setChatMessages, sefFillAiMessages }: ChatProps) => {
     // String together chat messages
     const formattedChatMessages = chatMessages?.map((message) => {
         return (
@@ -26,7 +29,7 @@ export const Chat = ({ className, chatMessages }: ChatProps) => {
     return (
         <div className={classNames(styles.root, className)}>
             <div className={styles['formated-text-area']}>{formattedChatMessages}</div>
-            <ChatInput />
+            <ChatInput setChatMessages={setChatMessages} sefFillAiMessages={sefFillAiMessages}/>
         </div>
     );
 };

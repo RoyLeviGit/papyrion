@@ -1,16 +1,50 @@
+import { Dispatch, SetStateAction, useState } from 'react';
 import classNames from 'classnames';
 import styles from './chat-input.module.scss';
+import { v4 as uuidv4 } from 'uuid';
+
+import { ChatMessage } from '../chat/chat';
 
 export interface ChatInputProps {
     className?: string;
-    text?: string;
+    setChatMessages: Dispatch<SetStateAction<ChatMessage[]>>;
+    sefFillAiMessages: Dispatch<SetStateAction<string[]>>;
 }
 
-export const ChatInput = ({ className, text }: ChatInputProps) => {
+export const ChatInput = ({ className, setChatMessages, sefFillAiMessages }: ChatInputProps) => {
+    const [message, setMessage] = useState('');
+
+    const handleMessageChange = (event: any) => {
+        setMessage(event.target.value);
+    };
+
+    const handleSendMessage = () => {
+        // Perform your logic to send the message
+        console.log('Sending message:', message);
+        setChatMessages((prevMessages) => {
+            const updatedMessages = [...prevMessages];
+            const newMessageId = uuidv4()
+            updatedMessages.push({ id: newMessageId, ai: false, message: message });
+
+            const aiMessageHistory = [newMessageId]
+            const aiResponseId = uuidv4()
+            updatedMessages.push({ id: aiResponseId, ai: true, message: "", history: aiMessageHistory });
+            sefFillAiMessages((prevFillMessages) => {
+                return [...prevFillMessages, aiResponseId]
+            })
+                
+            return updatedMessages;
+        });
+
+
+        // Clear the input field
+        setMessage('');
+    };
+
     return (
         <div className={classNames(styles.root, className)}>
-            <textarea className={styles.inputarea} value={text} placeholder={"Enter your message for answers from uploaded docs or click a document to generate questions! ✨"}></textarea>
-            <button>✅</button>
+            <textarea className={styles.inputarea} value={message} onChange={handleMessageChange} placeholder={"Enter your message for answers from uploaded docs or click a document to generate questions! ✨"}></textarea>
+            <button onClick={handleSendMessage}>✅</button>
         </div>
     );
 };

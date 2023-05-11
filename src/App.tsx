@@ -6,7 +6,6 @@ import { MultiChat } from './components/multi-chat/multi-chat';
 import Cookies from 'js-cookie';
 import { ChatMessage } from './components/chat/chat'
 import { v4 as uuidv4 } from 'uuid';
-import { error } from 'console';
 
 var textFromGPT = `
 ## This is a Markdown heading
@@ -34,8 +33,8 @@ function App() {
     // Dropzone selected item
     const [selectedFile, setSelectedFile] = useState<string>('');
     const [chatMessages, setChatMessages] = useState<ChatMessage[]>([
-        { id: "-2", ai: true, message: textFromGPT },
-        { id: "-1", ai: false, message: textFromGPT },
+        // { id: "-2", ai: true, message: textFromGPT },
+        // { id: "-1", ai: false, message: textFromGPT },
     ]);
     const [fillAiMessages, sefFillAiMessages] = useState<string[]>([])
 
@@ -236,7 +235,7 @@ function App() {
     return (
         <div className={styles.App}>
             <Dropzone text="📜" className={styles.dropzone} selectedFile={selectedFile} setSelectedFile={setSelectedFile} />
-            <MultiChat status={status.description} chatMessages={chatMessages}/>
+            <MultiChat status={status.description} chatMessages={chatMessages} setChatMessages={setChatMessages} sefFillAiMessages={sefFillAiMessages}/>
         </div>
     );
 }
