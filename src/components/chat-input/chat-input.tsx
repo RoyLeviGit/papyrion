@@ -8,10 +8,10 @@ import { ChatMessage } from '../chat/chat';
 export interface ChatInputProps {
     className?: string;
     setChatMessages: Dispatch<SetStateAction<ChatMessage[]>>;
-    sefFillAiMessages: Dispatch<SetStateAction<string[]>>;
+    setFillAiMessages: Dispatch<SetStateAction<string[]>>;
 }
 
-export const ChatInput = ({ className, setChatMessages, sefFillAiMessages }: ChatInputProps) => {
+export const ChatInput = ({ className, setChatMessages, setFillAiMessages }: ChatInputProps) => {
     const [message, setMessage] = useState('');
 
     const handleMessageChange = (event: any) => {
@@ -29,10 +29,10 @@ export const ChatInput = ({ className, setChatMessages, sefFillAiMessages }: Cha
             const aiMessageHistory = [newMessageId]
             const aiResponseId = uuidv4()
             updatedMessages.push({ id: aiResponseId, ai: true, message: "", history: aiMessageHistory });
-            sefFillAiMessages((prevFillMessages) => {
+            setFillAiMessages((prevFillMessages) => {
                 return [...prevFillMessages, aiResponseId]
             })
-                
+
             return updatedMessages;
         });
 

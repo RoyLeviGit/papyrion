@@ -9,14 +9,14 @@ export interface MultiChatProps {
     status?: string;
     chatMessages?: ChatMessage[];
     setChatMessages: Dispatch<SetStateAction<ChatMessage[]>>;
-    sefFillAiMessages: Dispatch<SetStateAction<string[]>>;
+    setFillAiMessages: Dispatch<SetStateAction<string[]>>;
 }
 
-export const MultiChat = ({ className, status, chatMessages, setChatMessages, sefFillAiMessages }: MultiChatProps) => {
+export const MultiChat = ({ className, status, chatMessages, setChatMessages, setFillAiMessages }: MultiChatProps) => {
     return (
         <div className={classNames(styles.root, className)}>
             <StatusBar status={status} />
-            <Chat chatMessages={chatMessages} setChatMessages={setChatMessages} sefFillAiMessages={sefFillAiMessages}/>
+            <Chat chatMessages={chatMessages} setChatMessages={setChatMessages} setFillAiMessages={setFillAiMessages}/>
         </div>
     );
 };

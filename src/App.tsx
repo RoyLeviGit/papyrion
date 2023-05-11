@@ -6,37 +6,18 @@ import { MultiChat } from './components/multi-chat/multi-chat';
 import Cookies from 'js-cookie';
 import { ChatMessage } from './components/chat/chat'
 import { v4 as uuidv4 } from 'uuid';
-
-var textFromGPT = `
-## This is a Markdown heading
-
-This is a paragraph with some *italic* and **bold** text.
-
-Here's some inline math: $\\int_0^\\infty e^{-x^2} dx = \\frac{\\sqrt{\\pi}}{2}$
-
-Here's a code snippet:
-
-\`\`\`javascript
-function add(a, b) {
-  return a + b;
-}
-\`\`\`
-  `;
+import { sendRequest } from './api/api';
 
 function App() {
-    const [socket, setSocket] = useState<WebSocket>();
     const [status, setStatus] = useState({
-        status: 'initial',
+        status: 'idle',
         description: 'Ready to chat! Please upload files and let\'s begin!'
     });
 
     // Dropzone selected item
-    const [selectedFile, setSelectedFile] = useState<string>('');
-    const [chatMessages, setChatMessages] = useState<ChatMessage[]>([
-        // { id: "-2", ai: true, message: textFromGPT },
-        // { id: "-1", ai: false, message: textFromGPT },
-    ]);
-    const [fillAiMessages, sefFillAiMessages] = useState<string[]>([])
+    const [selectedFile, setSelectedFile] = useState<string>("");
+    const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
+    const [fillAiMessages, setFillAiMessages] = useState<string[]>([])
 
     useEffect(() => {
         // Handle token refresh
@@ -76,84 +57,67 @@ function App() {
         }
     }, []);
 
+    const handleQuestionMessage = (data: any, messageId: string) => {
+        const nextMessageId = data.delimiter ? uuidv4() : messageId;
+        setChatMessages((prevMessages) => {
+            const updatedMessages = [...prevMessages];
+            const messageIndex = prevMessages.findIndex((element) => element.id === messageId)
+            updatedMessages[messageIndex].message += data.token;
+
+            if (data.delimiter) {
+                const aiMessageHistory = [updatedMessages[messageIndex].id]
+                const fillMessageId = uuidv4();
+                updatedMessages.splice(messageIndex + 1, 0, { id: fillMessageId, ai: true, message: "", history: aiMessageHistory });
+                setFillAiMessages((prevFillMessages) => {
+                    return [...prevFillMessages, fillMessageId]
+                })
+
+                // Start a new message
+                updatedMessages.push({ id: nextMessageId, ai: false, message: "" });
+            }
+    
+            return updatedMessages;
+        });
+        return nextMessageId;
+    };
+    
+    const handleCompletionMessage = (data: any, messageId: string) => {
+        setChatMessages((prevMessages) => {
+            const updatedMessages = [...prevMessages];
+            updatedMessages[prevMessages.findIndex((element) => element.id === messageId)].message += data.token;  
+            return updatedMessages;
+        });
+        return messageId;   
+    };
+    
+
     useEffect(() => {
-        const messageId = fillAiMessages[0]
+        const messageId = fillAiMessages[0];
         if (!messageId) {
             return;
         }
-        sefFillAiMessages((prevFillMessages) => {
-            return prevFillMessages.filter((element) => {element !== messageId})
-        });
 
-        const message = chatMessages.find((element) => element.id === messageId)
+        setFillAiMessages(prevFillMessages => prevFillMessages.filter(element => element !== messageId));
+
+        const message = chatMessages.find(element => element.id === messageId);
         if (!message || message.history?.length !== 1) {
             return;
         }
-        console.log(message)
 
         const lastHumanMessageId = message.history[message.history.length - 1];
         const prompt = {
-            page_content: chatMessages.find((element) => element.id === lastHumanMessageId)?.message
+            page_content: chatMessages.find(element => element.id === lastHumanMessageId)?.message
         };
-        const payload = JSON.stringify({
+        const payload = {
             prompt: prompt,
             chat_history: []
-        });
-        console.log(payload);
+        };
 
-        console.log('Sending completion request');
-        fetch(`http://${import.meta.env.VITE_API_URL}/completion`, {
-            method: 'POST',
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: payload
-        }).then(response => {
-            console.log(response);
-            if (response.body) {
-                const reader = response.body.getReader()
-                console.log(reader); 
-                const decoder = new TextDecoder('utf-8');
-                const readData = async () => {
-                    try {
-                        while (true) {
-                            const { done, value } = await reader.read();
-                            if (done) {
-                                break;
-                            }
+        const url = `http://${import.meta.env.VITE_API_URL}/completion`;
 
-                            // process the data
-                            const decodedValue = decoder.decode(value)
-                            console.log(decodedValue);
-                            // Check if the chunks start with "data: " and remove it if necessary
-                            const dataPrefix = 'data: ';
-                            const jsonValue = decodedValue.startsWith(dataPrefix) ? decodedValue.slice(dataPrefix.length) : decodedValue;
-                            try {
-                                const json = JSON.parse(jsonValue)
-                                console.log(json)   
-                                const data = json.data;
+        sendRequest(url, payload, handleCompletionMessage, () => {
 
-                                setChatMessages((prevMessages) => {
-                                    const updatedMessages = [...prevMessages];
-                                    updatedMessages[chatMessages.findIndex((element) => element.id === messageId)].message += data.token;  
-                                    return updatedMessages;
-                                });    
-                            } catch(error) {
-                                console.error(`Error parsing data: ${error}`);
-                                continue;
-                            }
-                        }
-                    } catch (error) {
-                        console.error(`Error reading data: ${error}`);
-                    } finally {
-                        reader.releaseLock();
-                    }
-                };  
-                readData();
-            }
-        }).catch(error => {
-            console.error(error);
-        })
+        }, messageId);
     }, [fillAiMessages]);
 
     useEffect(() => {
@@ -162,80 +126,35 @@ function App() {
                 status: "questioning",
                 description: `Questioning file ${selectedFile}...`,
             });
+        
+            const url = `http://${import.meta.env.VITE_API_URL}/question_doc`;
+            const body = {
+                document_id: selectedFile
+            };
 
-            console.log('Sending question request');
-            fetch(`http://${import.meta.env.VITE_API_URL}/question_doc`, {
-                method: 'POST',
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({
-                    document_id: selectedFile
-                })
-            }).then(response => {
-                if (response.body) {
-                    const reader = response.body.getReader()
-                    const decoder = new TextDecoder('utf-8');
-                    const readData = async () => {
-                        try {
-                          while (true) {
-                            const { done, value } = await reader.read();
-                            if (done) {
-                              break;
-                            }
-                            // process the data
-                            const decodedValue = decoder.decode(value)
-                            // Check if the chunks start with "data: " and remove it if necessary
-                            const dataPrefix = 'data: ';
-                            const jsonValue = decodedValue.startsWith(dataPrefix) ? decodedValue.slice(dataPrefix.length) : decodedValue;
-                            try {
-                                const json = JSON.parse(jsonValue)
-                                const data = json.data;
+            setChatMessages((prevMessages) => {
+                const updatedMessages = [...prevMessages];
 
-                                setChatMessages((prevMessages) => {
-                                    const updatedMessages = [...prevMessages];
-                                    if (updatedMessages.length > 0)
-                                      updatedMessages[updatedMessages.length - 1].message += data.token;
-                                    else
-                                      updatedMessages.push({ id: uuidv4(), ai: false, message: data.token });
-                        
-                                    if (data.delimiter) {
-                                        const aiMessageHistory = [updatedMessages[updatedMessages.length - 1].id]
-                                        updatedMessages.push({ id: uuidv4(), ai: true, message: "", history: aiMessageHistory });
-                                        const fillMessageId = updatedMessages[updatedMessages.length - 1].id;
-                                        sefFillAiMessages((prevFillMessages) => {
-                                            return [...prevFillMessages, fillMessageId]
-                                        })
-                
-                                        // Start a new message
-                                        updatedMessages.push({ id: uuidv4(), ai: false, message: "" });
-                                    }
-                            
-                                    return updatedMessages;
-                                });
-                            } catch(error) {
-                                console.error(`Error parsing data: ${error}`);
-                                continue
-                            }
-                          }
-                        } catch (error) {
-                          console.error(`Error reading data: ${error}`);
-                        } finally {
-                          reader.releaseLock();
-                        }    
-                    };
-                    readData()
-                }     
-            }).catch((e) => {
-                console.log(e);
-            })
+                const initialMessageId = uuidv4();
+                updatedMessages.push({ id: initialMessageId, ai: false, message: "" });
+
+                sendRequest(url, body, handleQuestionMessage, () => {
+                    setSelectedFile("")
+                    setStatus({
+                        status: "idle",
+                        description: `Done questioning ${selectedFile}! Keep chating or question another file`,
+                    });    
+                }, initialMessageId);
+    
+                return updatedMessages;
+            });
         }
-      }, [selectedFile]);
-
+    }, [selectedFile]);
+    
     return (
         <div className={styles.App}>
             <Dropzone text="📜" className={styles.dropzone} selectedFile={selectedFile} setSelectedFile={setSelectedFile} />
-            <MultiChat status={status.description} chatMessages={chatMessages} setChatMessages={setChatMessages} sefFillAiMessages={sefFillAiMessages}/>
+            <MultiChat status={status.description} chatMessages={chatMessages} setChatMessages={setChatMessages} setFillAiMessages={setFillAiMessages}/>
         </div>
     );
 }
