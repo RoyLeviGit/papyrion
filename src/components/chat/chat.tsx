@@ -7,6 +7,7 @@ export interface ChatMessage {
     id: string;
     ai: boolean;
     message: string;
+    history?: string[]
 }
 
 export interface ChatProps {
