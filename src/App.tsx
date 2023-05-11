@@ -37,6 +37,7 @@ function App() {
         { id: "-2", ai: true, message: textFromGPT },
         { id: "-1", ai: false, message: textFromGPT },
     ]);
+    const [fillAiMessages, sefFillAiMessages] = useState<string[]>([])
 
     useEffect(() => {
         // Handle token refresh
@@ -76,73 +77,85 @@ function App() {
         }
     }, []);
 
-    const fillAiMessage = async (message: ChatMessage) => {
-        if (message.history?.length == 1) {
-            const lastHumanMessageId = message.history[message.history.length - 1];
-            const prompt = {
-                page_content: chatMessages.find((element) => element.id === lastHumanMessageId)?.message
-            };
-            const payload = JSON.stringify({
-                prompt: prompt,
-                chat_history: []
-            });
-            console.log(payload);
-
-            console.log('Sending completion request');
-            fetch(`http://${import.meta.env.VITE_API_URL}/completion`, {
-                method: 'POST',
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: payload
-            }).then(response => {
-                console.log(response);
-                if (response.body) {
-                    const reader = response.body.getReader()
-                    console.log(reader); 
-                    const decoder = new TextDecoder('utf-8');
-                    const readData = async () => {
-                        try {
-                            while (true) {
-                                const { done, value } = await reader.read();
-                                if (done) {
-                                    break;
-                                }
-
-                                // process the data
-                                const decodedValue = decoder.decode(value)
-                                console.log(decodedValue);
-                                // Check if the chunks start with "data: " and remove it if necessary
-                                const dataPrefix = 'data: ';
-                                const jsonValue = decodedValue.startsWith(dataPrefix) ? decodedValue.slice(dataPrefix.length) : decodedValue;
-                                try {
-                                    const json = JSON.parse(jsonValue)
-                                    console.log(json)   
-                                    const data = json.data;
-
-                                    setChatMessages((prevMessages) => {
-                                        const updatedMessages = [...prevMessages];
-                                        updatedMessages[chatMessages.findIndex((element) => element.id === lastHumanMessageId)].message += data.token;  
-                                        return updatedMessages;
-                                    });    
-                                } catch(error) {
-                                    console.error(`Error parsing data: ${error}`);
-                                    continue;
-                                }
-                            }
-                        } catch (error) {
-                            console.error(`Error reading data: ${error}`);
-                        } finally {
-                            reader.releaseLock();
-                        }
-                        readData();
-                    };  
-                }
-            }).catch(error => {
-                console.error(error);
-            })
+    useEffect(() => {
+        const messageId = fillAiMessages[0]
+        if (!messageId) {
+            return;
         }
-    }
+        sefFillAiMessages((prevFillMessages) => {
+            return prevFillMessages.filter((element) => {element !== messageId})
+        });
+
+        const message = chatMessages.find((element) => element.id === messageId)
+        if (!message || message.history?.length !== 1) {
+            return;
+        }
+        console.log(message)
+
+        const lastHumanMessageId = message.history[message.history.length - 1];
+        const prompt = {
+            page_content: chatMessages.find((element) => element.id === lastHumanMessageId)?.message
+        };
+        const payload = JSON.stringify({
+            prompt: prompt,
+            chat_history: []
+        });
+        console.log(payload);
+
+        console.log('Sending completion request');
+        fetch(`http://${import.meta.env.VITE_API_URL}/completion`, {
+            method: 'POST',
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: payload
+        }).then(response => {
+            console.log(response);
+            if (response.body) {
+                const reader = response.body.getReader()
+                console.log(reader); 
+                const decoder = new TextDecoder('utf-8');
+                const readData = async () => {
+                    try {
+                        while (true) {
+                            const { done, value } = await reader.read();
+                            if (done) {
+                                break;
+                            }
+
+                            // process the data
+                            const decodedValue = decoder.decode(value)
+                            console.log(decodedValue);
+                            // Check if the chunks start with "data: " and remove it if necessary
+                            const dataPrefix = 'data: ';
+                            const jsonValue = decodedValue.startsWith(dataPrefix) ? decodedValue.slice(dataPrefix.length) : decodedValue;
+                            try {
+                                const json = JSON.parse(jsonValue)
+                                console.log(json)   
+                                const data = json.data;
+
+                                setChatMessages((prevMessages) => {
+                                    const updatedMessages = [...prevMessages];
+                                    updatedMessages[chatMessages.findIndex((element) => element.id === messageId)].message += data.token;  
+                                    return updatedMessages;
+                                });    
+                            } catch(error) {
+                                console.error(`Error parsing data: ${error}`);
+                                continue;
+                            }
+                        }
+                    } catch (error) {
+                        console.error(`Error reading data: ${error}`);
+                    } finally {
+                        reader.releaseLock();
+                    }
+                };  
+                readData();
+            }
+        }).catch(error => {
+            console.error(error);
+        })
+    }, [fillAiMessages]);
 
     useEffect(() => {
         if (selectedFile && status.status !== "questioning") {
@@ -161,10 +174,8 @@ function App() {
                     document_id: selectedFile
                 })
             }).then(response => {
-                console.log(response);
                 if (response.body) {
                     const reader = response.body.getReader()
-                    console.log(reader); 
                     const decoder = new TextDecoder('utf-8');
                     const readData = async () => {
                         try {
@@ -175,13 +186,11 @@ function App() {
                             }
                             // process the data
                             const decodedValue = decoder.decode(value)
-                            console.log(decodedValue);
                             // Check if the chunks start with "data: " and remove it if necessary
                             const dataPrefix = 'data: ';
                             const jsonValue = decodedValue.startsWith(dataPrefix) ? decodedValue.slice(dataPrefix.length) : decodedValue;
                             try {
                                 const json = JSON.parse(jsonValue)
-                                console.log(json)   
                                 const data = json.data;
 
                                 setChatMessages((prevMessages) => {
@@ -194,14 +203,17 @@ function App() {
                                     if (data.delimiter) {
                                         const aiMessageHistory = [updatedMessages[updatedMessages.length - 1].id]
                                         updatedMessages.push({ id: uuidv4(), ai: true, message: "", history: aiMessageHistory });
-                                        fillAiMessage(updatedMessages[updatedMessages.length - 1]);
+                                        const fillMessageId = updatedMessages[updatedMessages.length - 1].id;
+                                        sefFillAiMessages((prevFillMessages) => {
+                                            return [...prevFillMessages, fillMessageId]
+                                        })
                 
                                         // Start a new message
                                         updatedMessages.push({ id: uuidv4(), ai: false, message: "" });
                                     }
                             
                                     return updatedMessages;
-                                });     
+                                });
                             } catch(error) {
                                 console.error(`Error parsing data: ${error}`);
                                 continue
