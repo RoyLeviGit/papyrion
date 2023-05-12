@@ -28,7 +28,7 @@ export const Dropzone = ({ className, text, selectedFile, setSelectedFile, setSt
             return;
         }
 
-        fetch(`http://${import.meta.env.VITE_API_URL}/list-files`, {
+        fetch(`${import.meta.env.VITE_API_URL}/list-files`, {
             headers: {
                 Authorization: `Bearer ${Cookies.get('access_token')}`,
             },
@@ -50,7 +50,7 @@ export const Dropzone = ({ className, text, selectedFile, setSelectedFile, setSt
 
         Dz.autoDiscover = false;
         const dropzone = new Dz(dropzoneRef.current, {
-            url: `http://${import.meta.env.VITE_API_URL}/upload`,
+            url: `${import.meta.env.VITE_API_URL}/upload`,
             dictDefaultMessage:
                 text || "Drag 'n' drop some files here, or click to select files",
             headers: {
@@ -97,7 +97,7 @@ export const Dropzone = ({ className, text, selectedFile, setSelectedFile, setSt
             return;
         }
         
-        fetch(`http://${import.meta.env.VITE_API_URL}/delete-files`, {
+        fetch(`${import.meta.env.VITE_API_URL}/delete-files`, {
             method: 'POST',
             headers: {
                 Authorization: `Bearer ${Cookies.get('access_token')}`,

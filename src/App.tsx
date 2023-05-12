@@ -29,7 +29,7 @@ function App() {
     const getNewToken = () => {
         Cookies.remove('access_token');
         Cookies.remove('refresh_token');
-        fetch(`http://${import.meta.env.VITE_API_URL}/auth`, {
+        fetch(`${import.meta.env.VITE_API_URL}/auth`, {
             method: "POST"
         })
         .then(response => response.json())
@@ -58,7 +58,7 @@ function App() {
     useEffect(() => {
         if (Cookies.get('refresh_token')) {
             console.log(`Got refresh_token ${Cookies.get('refresh_token')}`);
-            fetch(`http://${import.meta.env.VITE_API_URL}/refresh`, {
+            fetch(`${import.meta.env.VITE_API_URL}/refresh`, {
                 method: 'POST',
                 headers: {
                     Authorization: `Bearer ${Cookies.get('refresh_token')}`
@@ -135,7 +135,7 @@ function App() {
             chat_history: []
         };
 
-        const url = `http://${import.meta.env.VITE_API_URL}/completion`;
+        const url = `${import.meta.env.VITE_API_URL}/completion`;
 
         sendRequest(url, payload, handleCompletionMessage, () => {
 
@@ -152,7 +152,7 @@ function App() {
             description: `Questioning file ${selectedFile}...`,
         });
     
-        const url = `http://${import.meta.env.VITE_API_URL}/question_doc`;
+        const url = `${import.meta.env.VITE_API_URL}/question_doc`;
         const body = {
             document_id: selectedFile
         };
