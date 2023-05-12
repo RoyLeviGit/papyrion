@@ -41,9 +41,22 @@ export const ChatInput = ({ className, setChatMessages, setFillAiMessages }: Cha
         setMessage('');
     };
 
+    const handleKeyDown = (event: any) => {
+        if (event.key === 'Enter' && !event.shiftKey) {
+            event.preventDefault();
+            handleSendMessage();
+        }
+    };
+
     return (
         <div className={classNames(styles.root, className)}>
-            <textarea className={styles.inputarea} value={message} onChange={handleMessageChange} placeholder={"Enter your message for answers from uploaded docs or click a document to generate questions! ✨"}></textarea>
+            <textarea 
+                className={styles.inputarea} 
+                value={message} 
+                onChange={handleMessageChange} 
+                onKeyDown={handleKeyDown}
+                placeholder={"Enter your message for answers from uploaded docs or click a document to generate questions! ✨"}
+            ></textarea>
             <button onClick={handleSendMessage}>✅</button>
         </div>
     );

@@ -58,8 +58,19 @@ export const Dropzone = ({ className, text, selectedFile, setSelectedFile }: Dro
                 parallelUploads: 1,
             });
             dropzone.on('addedfile', (file) => {
+                if (file.status === "added" || file.status === "error") {
+                    // Only continue with server listed files
+                    return;
+                }
+
                 file.previewElement.addEventListener('click', () => {
                     setSelectedFile?.(file.name);
+                });
+            });
+            dropzone.on('success', (file, response: any) => {
+                file.previewElement.addEventListener('click', () => {
+                    // Setting to file name as saved by the server
+                    setSelectedFile?.(response.document_id);
                 });
             });
 

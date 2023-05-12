@@ -11,6 +11,7 @@ export const processData = async (
     while (true) {
         const { done, value } = await reader.read();
         if (done) {
+            // Not really breaking here
             break;
         }
 
@@ -23,12 +24,10 @@ export const processData = async (
         try {
             json = JSON.parse(jsonValue);
         } catch (error) {
-            console.error(`Error parsing data: ${error}`);
             continue;
         }
 
         if (json.event === 'end_stream') {
-            console.log(json)
             break;
         }
 
@@ -45,15 +44,18 @@ export const sendRequest = async (
     handleDone: () => void,
     initialMessageId: string
 ) => {
+    const abortController = new AbortController();
     const response = await fetch(url, {
         method: 'POST',
         headers: {
         'Content-Type': 'application/json',
         },
         body: JSON.stringify(body),
+        signal: abortController.signal
     });
 
     if (response.body) {
         await processData(response.body.getReader(), handleMessage, handleDone, initialMessageId);
     }
+    abortController.abort();
 };
