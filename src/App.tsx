@@ -57,7 +57,6 @@ function App() {
 
     useEffect(() => {
         if (Cookies.get('refresh_token')) {
-            console.log(`Got refresh_token ${Cookies.get('refresh_token')}`);
             fetch(`${import.meta.env.VITE_API_URL}/refresh`, {
                 method: 'POST',
                 headers: {
