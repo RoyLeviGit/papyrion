@@ -20,7 +20,6 @@ export const ChatInput = ({ className, setChatMessages, setFillAiMessages }: Cha
 
     const handleSendMessage = () => {
         // Perform your logic to send the message
-        console.log('Sending message:', message);
         setChatMessages((prevMessages) => {
             const updatedMessages = [...prevMessages];
             const newMessageId = uuidv4()
