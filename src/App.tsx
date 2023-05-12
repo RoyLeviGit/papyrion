@@ -6,6 +6,7 @@ import { MultiChat } from './components/multi-chat/multi-chat';
 import Cookies from 'js-cookie';
 import { ChatMessage } from './components/chat/chat'
 import { v4 as uuidv4 } from 'uuid';
+import { Analytics } from '@vercel/analytics/react';
 import { sendRequest } from './api/api';
 
 export const idleStatus = {
@@ -178,6 +179,7 @@ function App() {
         <div className={styles.App}>
             <Dropzone text="📜" className={styles.dropzone} selectedFile={selectedFile} setSelectedFile={setSelectedFile} setStatus={setStatus} key={dropzoneKey} />
             <MultiChat status={status.description} chatMessages={chatMessages} setChatMessages={setChatMessages} setFillAiMessages={setFillAiMessages}/>
+            <Analytics />
         </div>
     );
 }
