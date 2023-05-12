@@ -8,52 +8,74 @@ import { ChatMessage } from './components/chat/chat'
 import { v4 as uuidv4 } from 'uuid';
 import { sendRequest } from './api/api';
 
-function App() {
-    const [status, setStatus] = useState({
-        status: 'idle',
-        description: 'Ready to chat! Please upload files and let\'s begin!'
-    });
+export const idleStatus = {
+    status: 'idle',
+    description: 'Ready to chat! Please upload files and let\'s begin!'
+};
+export const errorStatus = (error: any) => {
+    return {
+        status: "error",
+        description: `Error connecting to server: ${error}. Refreshing connection to server!`,
+    }
+};
 
-    // Dropzone selected item
-    const [selectedFile, setSelectedFile] = useState<string>("");
+function App() {
+    const [status, setStatus] = useState(idleStatus);
+    const [dropzoneKey, setDropzoneKey] = useState<number>(0);
+    const [selectedFile, setSelectedFile] = useState<string>("");    // Dropzone selected item
     const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
     const [fillAiMessages, setFillAiMessages] = useState<string[]>([])
 
+    const getNewToken = () => {
+        Cookies.remove('access_token');
+        Cookies.remove('refresh_token');
+        fetch(`http://${import.meta.env.VITE_API_URL}/auth`, {
+            method: "POST"
+        })
+        .then(response => response.json())
+        .then(data => {
+            Cookies.set('access_token', data.access_token);
+            Cookies.set('refresh_token', data.refresh_token);
+            setStatus(idleStatus);
+            setDropzoneKey((prevKey) => prevKey + 1)
+        })
+        .catch(error => {
+            setStatus({
+                status: "fatalError",
+                description: `Error connecting to server: ${error}. Try deleting cookies and refreshing page!`,        
+            });
+        });
+    };
+
     useEffect(() => {
-        // Handle token refresh
-        const getNewToken = () => {
-            Cookies.remove('access_token');
-            console.log('Getting new token');
-            fetch(`http://${import.meta.env.VITE_API_URL}/auth`)
+        if (status.status !== errorStatus('').status) {
+            return;
+        }
+
+        getNewToken();
+    }, [status.status]);
+
+    useEffect(() => {
+        if (Cookies.get('refresh_token')) {
+            console.log(`Got refresh_token ${Cookies.get('refresh_token')}`);
+            fetch(`http://${import.meta.env.VITE_API_URL}/refresh`, {
+                method: 'POST',
+                headers: {
+                    Authorization: `Bearer ${Cookies.get('refresh_token')}`
+                }
+            })
             .then(response => response.json())
             .then(data => {
-                console.log(data);
                 Cookies.set('access_token', data.access_token);
-                window.location.reload();
+                Cookies.set('refresh_token', data.refresh_token);
+                setStatus(idleStatus);
+                setDropzoneKey((prevKey) => prevKey + 1);    
             })
-            .catch(error => {
-                console.error('Error fetching access_token:', error);
-            });    
-        }
-        if (Cookies.get('access_token')) {
-            console.log(`Got access_token ${Cookies.get('access_token')}`);
-            // fetch(`http://${import.meta.env.VITE_API_URL}/refresh`, {
-            //     method: 'POST',
-            //     headers: {
-            //     'Authorization': `Bearer ${Cookies.get('access_token')}`
-            //     }
-            // })
-            // .then(response => {
-            //     if (response.status === 200) {
-            //         return;
-            //     }
-            // })
-            // .catch(error => {
-            //     console.error('An error occurred while checking the token:', error);
-            //     getNewToken()
-            // })
+            .catch((error) => {
+                setStatus(errorStatus(error));
+            });
         } else {
-            getNewToken()
+            setStatus(errorStatus("No token"));
         }
     }, []);
 
@@ -121,39 +143,41 @@ function App() {
     }, [fillAiMessages]);
 
     useEffect(() => {
-        if (selectedFile && status.status !== "questioning") {
-            setStatus({
-                status: "questioning",
-                description: `Questioning file ${selectedFile}...`,
-            });
-        
-            const url = `http://${import.meta.env.VITE_API_URL}/question_doc`;
-            const body = {
-                document_id: selectedFile
-            };
-
-            setChatMessages((prevMessages) => {
-                const updatedMessages = [...prevMessages];
-
-                const initialMessageId = uuidv4();
-                updatedMessages.push({ id: initialMessageId, ai: false, message: "" });
-
-                sendRequest(url, body, handleQuestionMessage, () => {
-                    setSelectedFile("")
-                    setStatus({
-                        status: "idle",
-                        description: `Done questioning ${selectedFile}! Keep chating or question another file`,
-                    });    
-                }, initialMessageId);
-    
-                return updatedMessages;
-            });
+        if (!selectedFile || status.status !== idleStatus.status) {
+            return;
         }
+
+        setStatus({
+            status: "questioning",
+            description: `Questioning file ${selectedFile}...`,
+        });
+    
+        const url = `http://${import.meta.env.VITE_API_URL}/question_doc`;
+        const body = {
+            document_id: selectedFile
+        };
+
+        setChatMessages((prevMessages) => {
+            const updatedMessages = [...prevMessages];
+
+            const initialMessageId = uuidv4();
+            updatedMessages.push({ id: initialMessageId, ai: false, message: "" });
+
+            sendRequest(url, body, handleQuestionMessage, () => {
+                setSelectedFile("")
+                setStatus({
+                    status: idleStatus.status,
+                    description: `Done questioning ${selectedFile}! Keep chating or question another file`,
+                });  
+            }, initialMessageId);
+
+            return updatedMessages;
+        });
     }, [selectedFile]);
     
     return (
         <div className={styles.App}>
-            <Dropzone text="📜" className={styles.dropzone} selectedFile={selectedFile} setSelectedFile={setSelectedFile} />
+            <Dropzone text="📜" className={styles.dropzone} selectedFile={selectedFile} setSelectedFile={setSelectedFile} setStatus={setStatus} key={dropzoneKey} />
             <MultiChat status={status.description} chatMessages={chatMessages} setChatMessages={setChatMessages} setFillAiMessages={setFillAiMessages}/>
         </div>
     );

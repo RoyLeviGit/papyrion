@@ -1,3 +1,5 @@
+import Cookies from "js-cookie";
+
 export const processData = async (
   reader: ReadableStreamDefaultReader,
   handleMessage: (data: any, messageId: string) => string,
@@ -48,7 +50,8 @@ export const sendRequest = async (
     const response = await fetch(url, {
         method: 'POST',
         headers: {
-        'Content-Type': 'application/json',
+            Authorization: `Bearer ${Cookies.get('access_token')}`,
+            'Content-Type': 'application/json',
         },
         body: JSON.stringify(body),
         signal: abortController.signal
