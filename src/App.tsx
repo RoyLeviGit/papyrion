@@ -7,7 +7,7 @@ import Cookies from 'js-cookie';
 import { ChatMessage } from './components/chat/chat'
 import { v4 as uuidv4 } from 'uuid';
 import { Analytics } from '@vercel/analytics/react';
-import { sendRequest } from './api/api';
+import { getNewToken, refreshToken, sendSourceRequest } from './api/api';
 
 export const idleStatus = {
     status: 'idle',
@@ -27,25 +27,9 @@ function App() {
     const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
     const [fillAiMessages, setFillAiMessages] = useState<string[]>([])
 
-    const getNewToken = () => {
-        Cookies.remove('access_token');
-        Cookies.remove('refresh_token');
-        fetch(`${import.meta.env.VITE_API_URL}/auth`, {
-            method: "POST"
-        })
-        .then(response => response.json())
-        .then(data => {
-            Cookies.set('access_token', data.access_token);
-            Cookies.set('refresh_token', data.refresh_token);
-            setStatus(idleStatus);
-            setDropzoneKey((prevKey) => prevKey + 1)
-        })
-        .catch(error => {
-            setStatus({
-                status: "fatalError",
-                description: `Error connecting to server: ${error}. Try deleting cookies and refreshing page!`,        
-            });
-        });
+    const onNewToken = () => {
+        setStatus(idleStatus);
+        setDropzoneKey((prevKey) => prevKey + 1);
     };
 
     useEffect(() => {
@@ -53,28 +37,25 @@ function App() {
             return;
         }
 
-        getNewToken();
+        getNewToken(() => {
+            onNewToken()
+        }, (error) => {
+            setStatus({
+                status: "fatalError",
+                description: `Error connecting to server: ${error}. Try deleting cookies and refreshing page!`,        
+            });    
+        });
     }, [status.status]);
 
     useEffect(() => {
         if (Cookies.get('refresh_token')) {
-            fetch(`${import.meta.env.VITE_API_URL}/refresh`, {
-                method: 'POST',
-                headers: {
-                    Authorization: `Bearer ${Cookies.get('refresh_token')}`
-                }
-            })
-            .then(response => response.json())
-            .then(data => {
-                Cookies.set('access_token', data.access_token);
-                Cookies.set('refresh_token', data.refresh_token);
-                setStatus(idleStatus);
-                setDropzoneKey((prevKey) => prevKey + 1);    
-            })
-            .catch((error) => {
+            refreshToken(() => {
+                onNewToken();
+            }, (error) => {
                 setStatus(errorStatus(error));
             });
-        } else {
+        }
+         else {
             setStatus(errorStatus("No token"));
         }
     }, []);
@@ -137,7 +118,7 @@ function App() {
 
         const url = `${import.meta.env.VITE_API_URL}/completion`;
 
-        sendRequest(url, payload, handleCompletionMessage, () => {
+        sendSourceRequest(url, payload, handleCompletionMessage, () => {
 
         }, messageId);
     }, [fillAiMessages]);
@@ -163,7 +144,7 @@ function App() {
             const initialMessageId = uuidv4();
             updatedMessages.push({ id: initialMessageId, ai: false, message: "" });
 
-            sendRequest(url, body, handleQuestionMessage, () => {
+            sendSourceRequest(url, body, handleQuestionMessage, () => {
                 setSelectedFile("")
                 setStatus({
                     status: idleStatus.status,

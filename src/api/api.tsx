@@ -1,5 +1,47 @@
 import Cookies from "js-cookie";
 
+export const getNewToken = async (
+    handleSuccess: () => void,
+    handleError: (error: any) => void,
+) => {
+    Cookies.remove('access_token');
+    Cookies.remove('refresh_token');
+    fetch(`${import.meta.env.VITE_API_URL}/auth`, {
+        method: "POST"
+    })
+    .then(response => response.json())
+    .then(data => {
+        Cookies.set('access_token', data.access_token);
+        Cookies.set('refresh_token', data.refresh_token);
+        handleSuccess();
+    })
+    .catch(error => {
+        handleError(error);
+    });
+};
+
+export const refreshToken = async (
+    handleSuccess: () => void,
+    handleError: (error: any) => void,
+) => {
+    fetch(`${import.meta.env.VITE_API_URL}/refresh`, {
+        method: 'POST',
+        headers: {
+            Authorization: `Bearer ${Cookies.get('refresh_token')}`
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        Cookies.set('access_token', data.access_token);
+        Cookies.set('refresh_token', data.refresh_token);
+        handleSuccess();
+    })
+    .catch((error) => {
+        handleError(error);
+    });
+
+};
+
 export const processData = async (
   reader: ReadableStreamDefaultReader,
   handleMessage: (data: any, messageId: string) => string,
@@ -39,7 +81,7 @@ export const processData = async (
     handleDone()
 };
 
-export const sendRequest = async (
+export const sendSourceRequest = async (
     url: string,
     body: object,
     handleMessage: (data: any, messageId: string) => string,
