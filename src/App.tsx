@@ -7,7 +7,8 @@ import Cookies from 'js-cookie';
 import { ChatMessage } from './components/chat/chat'
 import { v4 as uuidv4 } from 'uuid';
 import { Analytics } from '@vercel/analytics/react';
-import { getNewToken, refreshToken, sendSourceRequest } from './api/api';
+import { getNewToken, refreshToken, sendSourceRequest, urlCompletion, urlQuestionDoc } from './api/api';
+import Hero from './components/hero/hero';
 
 export const idleStatus = {
     status: 'idle',
@@ -21,6 +22,7 @@ export const errorStatus = (error: any) => {
 };
 
 function App() {
+    const [showLandingPage, setShowLandingPage] = useState(true);
     const [status, setStatus] = useState(idleStatus);
     const [dropzoneKey, setDropzoneKey] = useState<number>(0);
     const [selectedFile, setSelectedFile] = useState<string>("");    // Dropzone selected item
@@ -116,7 +118,7 @@ function App() {
             chat_history: []
         };
 
-        const url = `${import.meta.env.VITE_API_URL}/completion`;
+        const url = urlCompletion;
 
         sendSourceRequest(url, payload, handleCompletionMessage, () => {
 
@@ -133,7 +135,7 @@ function App() {
             description: `Questioning file ${selectedFile}...`,
         });
     
-        const url = `${import.meta.env.VITE_API_URL}/question_doc`;
+        const url = urlQuestionDoc;
         const body = {
             document_id: selectedFile
         };
@@ -158,8 +160,11 @@ function App() {
     
     return (
         <div className={styles.App}>
-            <Dropzone text="📜" className={styles.dropzone} selectedFile={selectedFile} setSelectedFile={setSelectedFile} setStatus={setStatus} key={dropzoneKey} />
-            <MultiChat status={status.description} chatMessages={chatMessages} setChatMessages={setChatMessages} setFillAiMessages={setFillAiMessages}/>
+            <Hero/>
+            <div>
+                <Dropzone text="📜" className={styles.dropzone} selectedFile={selectedFile} setSelectedFile={setSelectedFile} setStatus={setStatus} key={dropzoneKey} />
+                <MultiChat status={status.description} chatMessages={chatMessages} setChatMessages={setChatMessages} setFillAiMessages={setFillAiMessages}/>
+            </div>
             <Analytics />
         </div>
     );

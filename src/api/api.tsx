@@ -1,12 +1,28 @@
 import Cookies from "js-cookie";
 
+// export const urlAuth = `${import.meta.env.VITE_API_URL}/auth`
+// export const urlRefresh = `${import.meta.env.VITE_API_URL}/refresh`
+// export const urlUploadFile = `${import.meta.env.VITE_API_URL}/upload`
+// export const urlListFiles = `${import.meta.env.VITE_API_URL}/list-files`
+// export const urlDeleteFiles = `${import.meta.env.VITE_API_URL}/delete-files`
+// export const urlQuestionDoc = `${import.meta.env.VITE_API_URL}/question_doc`
+// export const urlCompletion = `${import.meta.env.VITE_API_URL}/completion`
+
+export const urlAuth = `/auth`
+export const urlRefresh = `/refresh`
+export const urlUploadFile = `/upload`
+export const urlListFiles = `/list-files`
+export const urlDeleteFiles = `/delete-files`
+export const urlQuestionDoc = `/question_doc`
+export const urlCompletion = `/completion`
+
 export const getNewToken = async (
     handleSuccess: () => void,
     handleError: (error: any) => void,
 ) => {
     Cookies.remove('access_token');
     Cookies.remove('refresh_token');
-    fetch(`${import.meta.env.VITE_API_URL}/auth`, {
+    fetch(urlAuth, {
         method: "POST"
     })
     .then(response => response.json())
@@ -24,7 +40,7 @@ export const refreshToken = async (
     handleSuccess: () => void,
     handleError: (error: any) => void,
 ) => {
-    fetch(`${import.meta.env.VITE_API_URL}/refresh`, {
+    fetch(urlRefresh, {
         method: 'POST',
         headers: {
             Authorization: `Bearer ${Cookies.get('refresh_token')}`

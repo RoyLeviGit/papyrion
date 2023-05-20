@@ -8,6 +8,7 @@ import { errorStatus } from '../../App'
 
 import classNames from 'classnames';
 import styles from './dropzone.module.scss';
+import { urlDeleteFiles, urlListFiles, urlUploadFile } from '../../api/api';
 
 export interface DropzoneProps {
     className?: string;
@@ -28,7 +29,7 @@ export const Dropzone = ({ className, text, selectedFile, setSelectedFile, setSt
             return;
         }
 
-        fetch(`${import.meta.env.VITE_API_URL}/list-files`, {
+        fetch(urlListFiles, {
             headers: {
                 Authorization: `Bearer ${Cookies.get('access_token')}`,
             },
@@ -50,7 +51,7 @@ export const Dropzone = ({ className, text, selectedFile, setSelectedFile, setSt
 
         Dz.autoDiscover = false;
         const dropzone = new Dz(dropzoneRef.current, {
-            url: `${import.meta.env.VITE_API_URL}/upload`,
+            url: urlUploadFile,
             dictDefaultMessage:
                 text || "Drag 'n' drop some files here, or click to select files",
             headers: {
@@ -97,7 +98,7 @@ export const Dropzone = ({ className, text, selectedFile, setSelectedFile, setSt
             return;
         }
         
-        fetch(`${import.meta.env.VITE_API_URL}/delete-files`, {
+        fetch(urlDeleteFiles, {
             method: 'POST',
             headers: {
                 Authorization: `Bearer ${Cookies.get('access_token')}`,
