@@ -3,20 +3,26 @@ import classNames from 'classnames';
 import styles from './multi-chat.module.scss';
 import { Chat, ChatMessage } from '../chat/chat';
 import { StatusBar } from '../status-bar/status-bar';
+import { Dropzone } from '../dropzone/dropzone';
 
 export interface MultiChatProps {
     className?: string;
     status?: string;
+    setStatus: Dispatch<SetStateAction<{ status: string; description: string; }>>;
+    dropzoneKey?: number;
+    selectedFile?: string;
+    setSelectedFile?: (value: string) => void;
     chatMessages?: ChatMessage[];
     setChatMessages: Dispatch<SetStateAction<ChatMessage[]>>;
     setFillAiMessages: Dispatch<SetStateAction<string[]>>;
 }
 
-export const MultiChat = ({ className, status, chatMessages, setChatMessages, setFillAiMessages }: MultiChatProps) => {
+export const MultiChat = ({ className, status, dropzoneKey, setStatus, selectedFile, setSelectedFile, chatMessages, setChatMessages, setFillAiMessages }: MultiChatProps) => {
     return (
         <div className={classNames(styles.root, className)}>
-            <StatusBar status={status} />
+            <Dropzone className={styles.dropzone} selectedFile={selectedFile} setSelectedFile={setSelectedFile} setStatus={setStatus} key={dropzoneKey} />
             <Chat chatMessages={chatMessages} setChatMessages={setChatMessages} setFillAiMessages={setFillAiMessages}/>
+            <StatusBar status={status} />
         </div>
     );
 };

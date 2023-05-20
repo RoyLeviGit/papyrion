@@ -1,7 +1,6 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import classNames from 'classnames';
 import styles from './App.module.scss';
-import { Dropzone } from './components/dropzone/dropzone';
 import { MultiChat } from './components/multi-chat/multi-chat';
 import Cookies from 'js-cookie';
 import { ChatMessage } from './components/chat/chat'
@@ -22,12 +21,25 @@ export const errorStatus = (error: any) => {
 };
 
 function App() {
-    const [showLandingPage, setShowLandingPage] = useState(true);
+    const [emptyTopHeight, setEmptyTopHeight] = useState<number>(0);
     const [status, setStatus] = useState(idleStatus);
     const [dropzoneKey, setDropzoneKey] = useState<number>(0);
     const [selectedFile, setSelectedFile] = useState<string>("");    // Dropzone selected item
     const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
     const [fillAiMessages, setFillAiMessages] = useState<string[]>([])
+
+    useEffect(() => {
+        setEmptyTopHeight(Math.min((window.innerWidth - 1200) / 4, 160));
+
+        const handleResize = () => {
+            setEmptyTopHeight(Math.min((window.innerWidth - 1200) / 4, 160));
+        };
+    
+        window.addEventListener('resize', handleResize);
+        return () => {
+            window.removeEventListener('resize', handleResize);
+        };
+      }, []);
 
     const onNewToken = () => {
         setStatus(idleStatus);
@@ -160,11 +172,10 @@ function App() {
     
     return (
         <div className={styles.App}>
+            <div style={{minHeight: emptyTopHeight}}/>
             <Hero/>
-            <div>
-                <Dropzone text="📜" className={styles.dropzone} selectedFile={selectedFile} setSelectedFile={setSelectedFile} setStatus={setStatus} key={dropzoneKey} />
-                <MultiChat status={status.description} chatMessages={chatMessages} setChatMessages={setChatMessages} setFillAiMessages={setFillAiMessages}/>
-            </div>
+            <div className={styles.emptyMiddleArea}/>
+            <MultiChat status={status.description} chatMessages={chatMessages} setChatMessages={setChatMessages} setFillAiMessages={setFillAiMessages} selectedFile={selectedFile} setSelectedFile={setSelectedFile} setStatus={setStatus} dropzoneKey={dropzoneKey}/>
             <Analytics />
         </div>
     );
