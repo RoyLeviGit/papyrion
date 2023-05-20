@@ -8,6 +8,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { Analytics } from '@vercel/analytics/react';
 import { getNewToken, refreshToken, sendSourceRequest, urlCompletion, urlQuestionDoc } from './api/api';
 import Hero from './components/hero/hero';
+import { StatusBar } from './components/status-bar/status-bar';
 
 export const idleStatus = {
     status: 'idle',
@@ -20,19 +21,58 @@ export const errorStatus = (error: any) => {
     }
 };
 
+const message = `
+**Welcome to our Math Chat!**
+
+Here's an example of using code in JavaScript:
+
+\`\`\`javascript
+function square(number) {
+  return number * number;
+}
+
+console.log(square(5)); // Output: 25
+\`\`\`
+
+Now let's explore some inline and new line KaTeX math equations:
+
+Inline equation: $E = mc^2$
+
+New line equation:
+$$
+\int_{-\infty}^{\infty} e^{-x^2} \, dx = \sqrt{\pi}
+$$
+
+Feel free to ask any math-related questions or discuss your ideas. Enjoy the chat!
+`;
+
+console.log(message);
+
+
 function App() {
     const [emptyTopHeight, setEmptyTopHeight] = useState<number>(0);
     const [status, setStatus] = useState(idleStatus);
     const [dropzoneKey, setDropzoneKey] = useState<number>(0);
     const [selectedFile, setSelectedFile] = useState<string>("");    // Dropzone selected item
-    const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
+    const [chatMessages, setChatMessages] = useState<ChatMessage[]>([
+        {
+            id: "-2",
+            ai: false,
+            message: message
+        },
+        {
+            id: "-1",
+            ai: true,
+            message: message
+        }
+    ]);
     const [fillAiMessages, setFillAiMessages] = useState<string[]>([])
 
     useEffect(() => {
         setEmptyTopHeight(Math.min((window.innerWidth - 1200) / 4, 160));
 
         const handleResize = () => {
-            setEmptyTopHeight(Math.min((window.innerWidth - 1200) / 4, 160));
+            setEmptyTopHeight(Math.min(Math.max((window.innerWidth - 1200) / 4, 0), 160));
         };
     
         window.addEventListener('resize', handleResize);
@@ -172,10 +212,11 @@ function App() {
     
     return (
         <div className={styles.App}>
-            <div style={{minHeight: emptyTopHeight}}/>
+            {/* <div style={{minHeight: emptyTopHeight}}/>
             <Hero/>
-            <div className={styles.emptyMiddleArea}/>
-            <MultiChat status={status.description} chatMessages={chatMessages} setChatMessages={setChatMessages} setFillAiMessages={setFillAiMessages} selectedFile={selectedFile} setSelectedFile={setSelectedFile} setStatus={setStatus} dropzoneKey={dropzoneKey}/>
+            <div className={styles.emptyMiddleArea}/> */}
+            <MultiChat chatMessages={chatMessages} setChatMessages={setChatMessages} setFillAiMessages={setFillAiMessages} selectedFile={selectedFile} setSelectedFile={setSelectedFile} setStatus={setStatus} dropzoneKey={dropzoneKey}/>
+            <StatusBar status={status.description} />
             <Analytics />
         </div>
     );

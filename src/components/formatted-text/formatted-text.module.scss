@@ -1,13 +1,22 @@
 .root {
   display: flex;
   flex-direction: column;
-  margin: 0px 20%;
-  font-size: 16px;
-  padding: 0px;
+  font-family: 'Roboto', Helvetica;
+  font-size: 18px;
+  padding: 0px 16px;
+  border-radius: 32px;
 }
 
 code[class*='language-'] {
-  padding: 0;
-  margin: 0;
   color: rgb(137, 3, 174);
+}
+
+.ai {
+  margin-right: 32px;
+  background-color: rgba(162, 0, 168, 0.6);
+}
+
+.human {
+  margin-left: 32px;
+  background-color: rgba(14, 132, 136, 0.6);
 }

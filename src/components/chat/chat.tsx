@@ -22,13 +22,13 @@ export const Chat = ({ className, chatMessages, setChatMessages, setFillAiMessag
     // String together chat messages
     const formattedChatMessages = chatMessages?.map((message) => {
         return (
-            <FormattedText className={classNames(styles.message, message.ai ? styles.ai : styles.human)} text={message.message} key={message.id}/>
+            <FormattedText ai={message.ai} text={message.message} key={message.id}/>
         );
     });
 
     return (
         <div className={classNames(styles.root, className)}>
-            <div className={styles['formated-text-area']}>{formattedChatMessages}</div>
+            <div className={styles.formatedTextArea}>{formattedChatMessages}</div>
             <ChatInput setChatMessages={setChatMessages} setFillAiMessages={setFillAiMessages}/>
         </div>
     );

@@ -28,11 +28,12 @@ const CodeBlock = ({ language, value }: any) => {
 export interface FormattedTextProps {
     className?: string;
     text?: string;
+    ai?: boolean;
 }
 
-export const FormattedText = ({ className, text }: FormattedTextProps) => {
+export const FormattedText = ({ className, text, ai }: FormattedTextProps) => {
     return (
-        <div className={classNames(styles.root, className)}>
+        <div className={classNames(styles.root, className, ai ? styles.ai : styles.human)}>
             <ReactMarkdown
                 remarkPlugins={[remarkMath]}
                 rehypePlugins={[rehypeKatex]}
