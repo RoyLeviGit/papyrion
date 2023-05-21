@@ -1,12 +1,11 @@
 .root {
-  display: flex;
-  flex-direction: column;
   font-family: 'Roboto', Helvetica;
   font-size: 18px;
   padding: 0px 16px;
   margin: 2px 10px;
   border-radius: 32px;
-  overflow: auto;
+  width: fit-content;
+  max-width: calc(100% - 64px);
 }
 
 code[class*='language-'] {
@@ -19,6 +18,7 @@ code[class*='language-'] {
 }
 
 .human {
+  align-self: end;
   margin-left: 32px;
   background-color: rgba(14, 132, 136, 0.95);
 }

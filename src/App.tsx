@@ -45,6 +45,18 @@ $$
 
 Feel free to ask any math-related questions or discuss your ideas. Enjoy the chat!
 `;
+const short_message = `Welcome to our Math Chat!
+
+Here's an example of using code in JavaScript:
+\`\`\`javascript
+function square(number) {
+  return number * number;
+}
+
+console.log(square(5)); // Output: 25asdkljfaskljdhfakjsldh25asdkljfaskljdhf25asdkljfaskljdhfakjsldhfkljasakjsldhfkljasfkljas
+\`\`\`
+Some more text: 25asdkljfaskljdhfakjsldh25asdkljfaskljdhf25asdkljfaskljdhfakjsldhfkljasakjsldhfkljasfkljas25asdkljfaskljdhfakjsldh25asdkljfaskljdhf25asdkljfaskljdhfakjsldhfkljasakjsldhfkljasfkljas
+`;
 
 console.log(message);
 
@@ -56,14 +68,19 @@ function App() {
     const [dropzoneKey, setDropzoneKey] = useState<number>(0);
     const [selectedFile, setSelectedFile] = useState<string>("");    // Dropzone selected item
     const [chatMessages, setChatMessages] = useState<ChatMessage[]>([
-        // {
-        //     id: "-2",
-        //     ai: false,
-        //     message: message
-        // },
         {
             id: "-1",
+            ai: false,
+            message: message
+        },
+        {
+            id: "-2",
             ai: true,
+            message: message
+        },
+        {
+            id: "-3",
+            ai: false,
             message: message
         }
     ]);
@@ -219,7 +236,7 @@ function App() {
     
     return (
         <div className={styles.App}>
-            {/* <div style={{minHeight: emptyTopHeight}}/> */}
+            <div style={{minHeight: emptyTopHeight}}/>
             <Hero/>
             <div style={{minHeight: emptyMidHeight}}/>
             <MultiChat chatMessages={chatMessages} setChatMessages={setChatMessages} setFillAiMessages={setFillAiMessages} selectedFile={selectedFile} setSelectedFile={setSelectedFile} setStatus={setStatus} dropzoneKey={dropzoneKey}/>
