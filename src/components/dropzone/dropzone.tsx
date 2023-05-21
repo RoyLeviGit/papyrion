@@ -49,11 +49,9 @@ export const Dropzone = ({ className, text, selectedFile, setSelectedFile, setSt
             return;
         }
 
-        Dz.autoDiscover = false;
+        // Dz.autoDiscover = false;
         const dropzone = new Dz(dropzoneRef.current, {
             url: urlUploadFile,
-            dictDefaultMessage:
-                text || "Drag 'n' drop some files here, or click to select files",
             headers: {
                 Authorization: `Bearer ${Cookies.get('access_token')}`,
             },
@@ -117,7 +115,11 @@ export const Dropzone = ({ className, text, selectedFile, setSelectedFile, setSt
     return (
         <div className={classNames(styles.root, className)}>
             <button onClick={onResetClick}>Reset</button>
-            <div ref={dropzoneRef} className={classNames('dropzone', styles.dropzone)} />
+            <div ref={dropzoneRef} className={classNames('dropzone', styles.dD)}>
+                <p className={styles.dDText}>
+                    Drag and drop your content here or click to upload
+                </p>
+            </div>
         </div>
     );
 };

@@ -1,28 +1,33 @@
-.hero {
-  display: flex;
-  flex-direction: column;
-  margin: auto;
+@import '../../App.module';
 
-  .mainTitle {
+.hero {
+    display: flex;
+    flex-direction: column;
+    margin: auto;
+    padding: 10px;
+    max-width: 1120px;
+}
+
+.mainTitle {
     color: #3f1432;
     font-family: 'Roboto', Helvetica;
     font-size: 48px;
     font-weight: 800;
-  }
+}
 
-  .secondaryTitle {
+.secondaryTitle {
     color: #3f1432;
     font-family: 'Roboto', Helvetica;
     font-size: 48px;
-  }
+}
 
-  .description {
+.description {
     color: #3f1432;
     font-family: 'Roboto', Helvetica;
     font-size: 24px;
-  }
+}
 
-  .dD {
+.dD {
     background-color: #e0cfde80;
     border: 8px solid;
     border-color: #e0cfde80;
@@ -35,25 +40,23 @@
 
     transition: all 0.3s;
     &:hover {
-      transform: scale(1.01);
-      box-shadow: 2.83px 2.83px 2px #06071480;
+        transform: scale(1.01);
+        box-shadow: 2.83px 2.83px 2px #06071480;
     }
-  }
+}
 
-  .dDText {
+.dDText {
     color: #3f1432;
     font-family: 'Roboto', Helvetica;
     font-size: 24px;
     text-align: center;
-    margin: 50px;
-  }
-  padding: 10px;
-  max-width: 1120px;
+    margin: 30px;
 }
 
+
 @media (max-width: 767px) {
-  .hero {
-    align-items: center;
-    text-align: center;
-  }
+    .hero {
+        align-items: center;
+        text-align: center;
+    }
 }

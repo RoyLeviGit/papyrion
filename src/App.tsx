@@ -51,15 +51,16 @@ console.log(message);
 
 function App() {
     const [emptyTopHeight, setEmptyTopHeight] = useState<number>(0);
+    const [emptyMidHeight, setEmptyMidHeight] = useState<number>(0);
     const [status, setStatus] = useState(idleStatus);
     const [dropzoneKey, setDropzoneKey] = useState<number>(0);
     const [selectedFile, setSelectedFile] = useState<string>("");    // Dropzone selected item
     const [chatMessages, setChatMessages] = useState<ChatMessage[]>([
-        {
-            id: "-2",
-            ai: false,
-            message: message
-        },
+        // {
+        //     id: "-2",
+        //     ai: false,
+        //     message: message
+        // },
         {
             id: "-1",
             ai: true,
@@ -69,10 +70,16 @@ function App() {
     const [fillAiMessages, setFillAiMessages] = useState<string[]>([])
 
     useEffect(() => {
-        setEmptyTopHeight(Math.min((window.innerWidth - 1200) / 4, 160));
+        const newTopHeight = () => {
+            const newEmptyTopHeight = Math.min(Math.max((window.innerWidth - 1200) / 4, 0), 160);
+            const heroElement = document.querySelector('.hero');
+            setEmptyMidHeight(heroElement ? window.innerHeight - newEmptyTopHeight - heroElement.clientHeight + 50 : 0); 
+            return newEmptyTopHeight;
+        }
+        setEmptyTopHeight(newTopHeight());
 
         const handleResize = () => {
-            setEmptyTopHeight(Math.min(Math.max((window.innerWidth - 1200) / 4, 0), 160));
+            setEmptyTopHeight(newTopHeight());
         };
     
         window.addEventListener('resize', handleResize);
@@ -212,9 +219,9 @@ function App() {
     
     return (
         <div className={styles.App}>
-            {/* <div style={{minHeight: emptyTopHeight}}/>
+            {/* <div style={{minHeight: emptyTopHeight}}/> */}
             <Hero/>
-            <div className={styles.emptyMiddleArea}/> */}
+            <div style={{minHeight: emptyMidHeight}}/>
             <MultiChat chatMessages={chatMessages} setChatMessages={setChatMessages} setFillAiMessages={setFillAiMessages} selectedFile={selectedFile} setSelectedFile={setSelectedFile} setStatus={setStatus} dropzoneKey={dropzoneKey}/>
             <StatusBar status={status.description} />
             <Analytics />

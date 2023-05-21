@@ -1,16 +1,28 @@
 .root {
-  display: flex;
-  flex-direction: row;
-  width: 100%;
-  max-width: 900px;
+    display: flex;
+    flex-direction: column;
+    max-width: 900px;
+    // padding: 12px;
+    position: relative;
 }
 
 .inputarea {
-  resize: none;
-  display: flex;
-  background-color: rgba(255, 255, 255, 0);
-  margin: 12px;
-  width: 100%;
-  font-family: 'Roboto', Helvetica;
-  font-size: 18px;
+    resize: none;
+    display: flex;
+    background-color: rgba(255, 255, 255, 0);
+    font-family: 'Roboto', Helvetica;
+    font-size: 18px;
+    border: none;
+    outline: none;
+}
+.uploadFileButton {
+}
+.sendMessageButton {
+}
+.ChatInputButtons {
+    display: flex;
+    flex-direction: row;
+    position: absolute;
+    bottom: 0px;
+    right: 0px;
 }

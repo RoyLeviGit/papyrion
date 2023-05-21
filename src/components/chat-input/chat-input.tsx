@@ -65,7 +65,14 @@ export const ChatInput = ({ className, setChatMessages, setFillAiMessages }: Cha
                     'Enter your message for answers from uploaded docs or click a document to generate questions! ✨'
                 }
             ></TextareaAutosize>
-            <button onClick={handleSendMessage}>✅</button>
+            <div className={styles.ChatInputButtons}>
+                <button onClick={handleSendMessage} className={styles.uploadFileButton}>
+                    📜
+                </button>
+                <button onClick={handleSendMessage} className={styles.sendMessageButton}>
+                    ✅
+                </button>
+            </div>
         </div>
     );
 };

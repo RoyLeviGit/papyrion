@@ -1,26 +1,23 @@
+@import '../hero/hero.module';
+
 .root {
-  display: flex;
-  flex-direction: column;
-  overflow: auto;
-  border-image: linear-gradient(
-      180deg,
-      rgba(255, 255, 255, 0) 0%,
-      #9e3abf 50%,
-      rgba(255, 255, 255, 0) 100%
-    )
-    1 / 2px stretch;
-  margin: 4px;
+    display: flex;
+    flex-direction: column;
+    overflow: auto;
+    min-width: 310px;
 }
 
-.selected {
-  background-color: rgb(64, 191, 21);
+
+.dD {
+    @extend .dD;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    margin: 5px;
 }
-.dropzone {
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-  &:hover {
-    background-color: rgba(0, 0, 0, 0.1);
-  }
-  margin: 5px;
+
+@media (max-width: 767px) {
+    .root {
+        display: none;
+    }
 }

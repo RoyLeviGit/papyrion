@@ -4,7 +4,9 @@
   font-family: 'Roboto', Helvetica;
   font-size: 18px;
   padding: 0px 16px;
+  margin: 2px 10px;
   border-radius: 32px;
+  overflow: auto;
 }
 
 code[class*='language-'] {
@@ -13,10 +15,10 @@ code[class*='language-'] {
 
 .ai {
   margin-right: 32px;
-  background-color: rgba(162, 0, 168, 0.6);
+  background-color: rgba(162, 0, 168, 0.95);
 }
 
 .human {
   margin-left: 32px;
-  background-color: rgba(14, 132, 136, 0.6);
+  background-color: rgba(14, 132, 136, 0.95);
 }
