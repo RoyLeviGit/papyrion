@@ -16,9 +16,10 @@ export interface ChatProps {
     chatMessages?: ChatMessage[];
     setChatMessages: Dispatch<SetStateAction<ChatMessage[]>>;
     setFillAiMessages: Dispatch<SetStateAction<string[]>>;
+    setDropzoneDisplayed: Dispatch<SetStateAction<boolean>>;
 }
 
-export const Chat = ({ className, chatMessages, setChatMessages, setFillAiMessages }: ChatProps) => {
+export const Chat = ({ className, chatMessages, setChatMessages, setFillAiMessages, setDropzoneDisplayed }: ChatProps) => {
     // String together chat messages
     const formattedChatMessages = chatMessages?.map((message) => {
         return (
@@ -29,7 +30,7 @@ export const Chat = ({ className, chatMessages, setChatMessages, setFillAiMessag
     return (
         <div className={classNames(styles.root, className)}>
             <div className={styles.formatedTextArea}>{formattedChatMessages}</div>
-            <ChatInput setChatMessages={setChatMessages} setFillAiMessages={setFillAiMessages}/>
+            <ChatInput setChatMessages={setChatMessages} setFillAiMessages={setFillAiMessages} setDropzoneDisplayed={setDropzoneDisplayed}/>
         </div>
     );
 };

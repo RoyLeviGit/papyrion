@@ -68,21 +68,21 @@ function App() {
     const [dropzoneKey, setDropzoneKey] = useState<number>(0);
     const [selectedFile, setSelectedFile] = useState<string>("");    // Dropzone selected item
     const [chatMessages, setChatMessages] = useState<ChatMessage[]>([
-        {
-            id: "-1",
-            ai: false,
-            message: message
-        },
-        {
-            id: "-2",
-            ai: true,
-            message: message
-        },
-        {
-            id: "-3",
-            ai: false,
-            message: message
-        }
+        // {
+        //     id: "-1",
+        //     ai: false,
+        //     message: message
+        // },
+        // {
+        //     id: "-2",
+        //     ai: true,
+        //     message: message
+        // },
+        // {
+        //     id: "-3",
+        //     ai: false,
+        //     message: message
+        // }
     ]);
     const [fillAiMessages, setFillAiMessages] = useState<string[]>([])
 

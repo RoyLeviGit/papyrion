@@ -1,4 +1,4 @@
-import { Dispatch, SetStateAction } from 'react';
+import { Dispatch, SetStateAction, useState } from 'react';
 import classNames from 'classnames';
 import styles from './multi-chat.module.scss';
 import { Chat, ChatMessage } from '../chat/chat';
@@ -25,9 +25,13 @@ export const MultiChat = ({
     setChatMessages,
     setFillAiMessages,
 }: MultiChatProps) => {
+    const [dropzoneDisplayed, setDropzoneDisplayed] = useState(false); 
+
     return (
         <div className={classNames(styles.root, className)}>
             <Dropzone
+                displayed={dropzoneDisplayed}
+                setDisplayed={setDropzoneDisplayed}
                 selectedFile={selectedFile}
                 setSelectedFile={setSelectedFile}
                 setStatus={setStatus}
@@ -37,6 +41,7 @@ export const MultiChat = ({
                 chatMessages={chatMessages}
                 setChatMessages={setChatMessages}
                 setFillAiMessages={setFillAiMessages}
+                setDropzoneDisplayed={setDropzoneDisplayed}
             />
         </div>
     );

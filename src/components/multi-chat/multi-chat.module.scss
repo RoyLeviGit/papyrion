@@ -2,9 +2,10 @@
   display: flex;
   flex-direction: row;
   height: 80vh;
-  width: 100%;
+  padding: 10px;
+  width: calc(100% - 20px);
   max-width: 100vw;
-  padding: 10vh 0px;
   justify-content: space-between;
   align-content: space-between;
+  position: relative;
 }

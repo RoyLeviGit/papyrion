@@ -3,6 +3,8 @@
     flex-direction: column;
     width: 100%;
     position: relative;
+    box-shadow: rgb(223, 222, 222) 0px 0px 6px 1px inset;
+    background-color: rgba(233, 233, 233, 0.25);  
 }
 
 .inputarea {
@@ -15,13 +17,22 @@
     outline: none;
 }
 .uploadFileButton {
+    display: none;
 }
+
 .sendMessageButton {
 }
+
 .ChatInputButtons {
     display: flex;
     flex-direction: row;
     position: absolute;
     bottom: 0px;
     right: 0px;
+}
+
+@media (max-width: 1250px) {
+    .uploadFileButton {
+        display: unset;
+    }    
 }

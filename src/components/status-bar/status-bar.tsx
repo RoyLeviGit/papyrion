@@ -9,7 +9,7 @@ export interface StatusBarProps {
 export const StatusBar = ({ className, status }: StatusBarProps) => {
     return (
         <div className={classNames(styles.root, className)}>
-            { status }
+            {/* { status } */}
             <a href="https://www.buymeacoffee.com/papyrion" target={"_blank"}>
                 Buy me a coffee ☕️
             </a>

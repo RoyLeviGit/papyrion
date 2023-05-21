@@ -12,13 +12,16 @@ import { urlDeleteFiles, urlListFiles, urlUploadFile } from '../../api/api';
 
 export interface DropzoneProps {
     className?: string;
+    displayed?: boolean;
+    setDisplayed?: Dispatch<SetStateAction<boolean>>;
     text?: string;
     selectedFile?: string;
     setSelectedFile?: (value: string) => void;
     setStatus: Dispatch<SetStateAction<{ status: string; description: string; }>>;
 }
 
-export const Dropzone = ({ className, text, selectedFile, setSelectedFile, setStatus }: DropzoneProps) => {
+export const Dropzone = ({ className, displayed, setDisplayed, text, selectedFile, setSelectedFile, setStatus }: DropzoneProps) => {
+    const rootRef = useRef<HTMLDivElement>(null);
     const dropzoneRef = useRef<HTMLDivElement>(null);
 
     const [fetchedFiles, setFetchedFiles] = useState<DropzoneMockFile[]>([]);
@@ -112,9 +115,17 @@ export const Dropzone = ({ className, text, selectedFile, setSelectedFile, setSt
         });
     };
 
+    const onDisplayedDropzoneClick = (event: React.MouseEvent) => {
+        if (event.target !== rootRef.current) {
+            return;
+        }
+        setDisplayed?.(false);
+        console.log(displayed)
+    };
+
     return (
-        <div className={classNames(styles.root, className)}>
-            <button onClick={onResetClick}>Reset</button>
+        <div ref={rootRef} className={classNames(styles.root, className, !displayed && styles.hidden)} onClick={onDisplayedDropzoneClick}>
+            <button className={styles.resetButton} onClick={onResetClick}>Reset</button>
             <div ref={dropzoneRef} className={classNames('dropzone', styles.dD)}>
                 <p className={styles.dDText}>
                     Drag and drop your content here or click to upload
