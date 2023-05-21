@@ -1,34 +1,28 @@
-@import '../hero/hero.module';
-
-.root {
+.dropzone {
     display: flex;
-    flex-direction: column;
-}
+    overflow: auto;
+    background-color: #e0cfde80;
+    border: 8px solid;
+    border-color: #e0cfde80;
+    border-radius: 24px;
+    justify-content: center;
+    align-items: center;
 
-.resetButton {
-    width: fit-content;
-}
-
-
-.dD {
-    @extend .dD;
-    display: flex;
-    flex-direction: column;
-    height: 100%;
-    margin: 5px;
-}
-
-@media (max-width: 1250px) {
-    .root {
-        position: absolute;
-        top: 0px;
-        left: 0px;
-        height: 100%;
-        width: 100%;
-        background-color: rgba(233, 233, 233, 0.25);
+    transition: all 0.3s;
+    &:hover {
+        transform: scale(1.01);
+        box-shadow: 2.83px 2.83px 2px #06071480;
     }
-    
-    .hidden {
-        display: none;
-    }
+}
+
+.dropzoneText {
+    color: #3f1432;
+    font-family: 'Roboto', Helvetica;
+    font-size: 24px;
+    text-align: center;
+    margin: 30px;
+}
+
+.dropzoneTextHidden {
+    display: none;
 }

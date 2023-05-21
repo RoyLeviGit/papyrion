@@ -1,10 +1,18 @@
 // Hero component
-import React from 'react';
+import { Dispatch, SetStateAction } from 'react';
 import { Dropzone } from '../dropzone/dropzone';
 import styles from './hero.module.scss';  // You need to create this
 import classNames from 'classnames';
+import { DropzoneMockFile } from 'dropzone';
 
-function Hero({  }) {
+export interface HeroProps {
+    dropzoneKey?: number;
+    fetchedFiles: DropzoneMockFile[];
+    setFetchedFiles: Dispatch<SetStateAction<DropzoneMockFile[]>>;
+    setStatus: Dispatch<SetStateAction<{ status: string; description: string }>>;
+};
+
+function Hero({ dropzoneKey, fetchedFiles, setFetchedFiles, setStatus }: HeroProps) {
     return (
         <div className={classNames("hero", styles.hero)}>
             <div className={styles.titles}>
@@ -17,11 +25,12 @@ function Hero({  }) {
                     intelligent system handle your document-related tasks
                 </p>
             </div>
-            <div className={classNames('dropzone', styles.dD)}>
-                <p className={styles.dDText}>
-                    Drag and drop your content here or click to upload
-                </p>
-            </div>
+            <Dropzone
+                key={dropzoneKey}
+                setStatus={setStatus}
+                fetchedFiles={fetchedFiles}
+                setFetchedFiles={setFetchedFiles}
+            />
         </div>
     );
 }

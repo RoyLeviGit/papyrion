@@ -9,6 +9,7 @@ import { Analytics } from '@vercel/analytics/react';
 import { getNewToken, refreshToken, sendSourceRequest, urlCompletion, urlQuestionDoc } from './api/api';
 import Hero from './components/hero/hero';
 import { StatusBar } from './components/status-bar/status-bar';
+import { DropzoneMockFile } from 'dropzone';
 
 export const idleStatus = {
     status: 'idle',
@@ -66,6 +67,7 @@ function App() {
     const [emptyMidHeight, setEmptyMidHeight] = useState<number>(0);
     const [status, setStatus] = useState(idleStatus);
     const [dropzoneKey, setDropzoneKey] = useState<number>(0);
+    const [fetchedFiles, setFetchedFiles] = useState<DropzoneMockFile[]>([]);
     const [selectedFile, setSelectedFile] = useState<string>("");    // Dropzone selected item
     const [chatMessages, setChatMessages] = useState<ChatMessage[]>([
         // {
@@ -237,9 +239,9 @@ function App() {
     return (
         <div className={styles.App}>
             <div style={{minHeight: emptyTopHeight}}/>
-            <Hero/>
+            <Hero dropzoneKey={dropzoneKey} fetchedFiles={fetchedFiles} setFetchedFiles={setFetchedFiles} setStatus={setStatus}/>
             <div style={{minHeight: emptyMidHeight}}/>
-            <MultiChat chatMessages={chatMessages} setChatMessages={setChatMessages} setFillAiMessages={setFillAiMessages} selectedFile={selectedFile} setSelectedFile={setSelectedFile} setStatus={setStatus} dropzoneKey={dropzoneKey}/>
+            <MultiChat chatMessages={chatMessages} setChatMessages={setChatMessages} setFillAiMessages={setFillAiMessages} selectedFile={selectedFile} setSelectedFile={setSelectedFile} setStatus={setStatus} dropzoneKey={dropzoneKey + 1} fetchedFiles={fetchedFiles} setFetchedFiles={setFetchedFiles}/>
             <StatusBar status={status.description} />
             <Analytics />
         </div>

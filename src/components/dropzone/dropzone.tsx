@@ -12,19 +12,23 @@ import { urlDeleteFiles, urlListFiles, urlUploadFile } from '../../api/api';
 
 export interface DropzoneProps {
     className?: string;
-    displayed?: boolean;
-    setDisplayed?: Dispatch<SetStateAction<boolean>>;
-    text?: string;
+    fetchedFiles: DropzoneMockFile[];
+    setFetchedFiles: Dispatch<SetStateAction<DropzoneMockFile[]>>;
     selectedFile?: string;
     setSelectedFile?: (value: string) => void;
     setStatus: Dispatch<SetStateAction<{ status: string; description: string; }>>;
 }
 
-export const Dropzone = ({ className, displayed, setDisplayed, text, selectedFile, setSelectedFile, setStatus }: DropzoneProps) => {
-    const rootRef = useRef<HTMLDivElement>(null);
+export const Dropzone = ({ 
+    className,
+    fetchedFiles,
+    setFetchedFiles,
+    selectedFile, 
+    setSelectedFile,
+    setStatus
+}: DropzoneProps) => {
     const dropzoneRef = useRef<HTMLDivElement>(null);
-
-    const [fetchedFiles, setFetchedFiles] = useState<DropzoneMockFile[]>([]);
+    const [dropzone, setDropzone] = useState<Dropzone | undefined>(undefined);
 
     // Serverside fetch files
     useEffect(() => {
@@ -39,7 +43,22 @@ export const Dropzone = ({ className, displayed, setDisplayed, text, selectedFil
         })
         .then((response) => response.json())
         .then((data) => {
-            setFetchedFiles(data);
+            var foundNewFile = false;
+            for (let i = 0; i < data.length; i++) {
+                try {
+                    if (dropzone?.files.some(file => file.name === data[i].name)) {
+                        // Already in dropzone, skip
+                        continue;
+                    }    
+                } catch (error) {
+                    console.error(error);
+                }
+                foundNewFile = true;
+                break;
+            }
+            if (foundNewFile) {
+                setFetchedFiles?.(data);
+            }
         })
         .catch((error) => {
             setStatus(errorStatus(error));
@@ -48,89 +67,82 @@ export const Dropzone = ({ className, displayed, setDisplayed, text, selectedFil
 
     // Dropzone initialization
     useEffect(() => {
-        if (!dropzoneRef.current || !Cookies.get('access_token')) {
+        if (!dropzoneRef.current) { //|| !Cookies.get('access_token')) {
             return;
         }
 
         // Dz.autoDiscover = false;
-        const dropzone = new Dz(dropzoneRef.current, {
-            url: urlUploadFile,
-            headers: {
-                Authorization: `Bearer ${Cookies.get('access_token')}`,
-            },
-            parallelUploads: 1,
-        });
-        dropzone.on('addedfile', (file) => {
-            if (file.status === "added" || file.status === "error") {
-                // Only continue with server listed files
-                return;
+        setDropzone(() => {
+            if (!dropzoneRef.current) { //|| !Cookies.get('access_token')) {
+                return undefined;
             }
 
-            file.previewElement.addEventListener('click', () => {
-                setSelectedFile?.(file.name);
+            const dz = new Dz(dropzoneRef.current, {
+                url: urlUploadFile,
+                dictDefaultMessage: "",
+                headers: {
+                    Authorization: `Bearer ${Cookies.get('access_token')}`,
+                },
+                parallelUploads: 1,
             });
-        });
-        dropzone.on('success', (file, response: any) => {
-            file.previewElement.addEventListener('click', () => {
-                // Setting to file name as saved by the server
-                setSelectedFile?.(response.document_id);
+            dz.on('addedfile', (file) => {
+                if (file.status === "added" || file.status === "error") {
+                    // Only continue with server listed files
+                    return;
+                }
+    
+                file.previewElement.addEventListener('click', () => {
+                    setSelectedFile?.(file.name);
+                });
             });
+            dz.on('addedfiles', (files) => {
+                // Add to fetchedFiles
+                for (let i = 0; i < files.length; i++) {
+                    if (fetchedFiles.some(fetchFile => fetchFile.name === files[i].name)) {
+                        return;
+                    }
+                }
+                setFetchedFiles([...fetchedFiles, ...files]);
+            });
+            
+            dz.on('success', (file, response: any) => {
+                file.previewElement.addEventListener('click', () => {
+                    // Setting to file name as saved by the server
+                    setSelectedFile?.(response.document_id);
+                });
+            });
+            return dz
         });
 
-        if (fetchedFiles) {
+        return () => {
+            dropzone?.destroy();
+        };
+    }, []);
+
+    useEffect(() => {
+        if (dropzone && fetchedFiles) {
             for (let i = 0; i < fetchedFiles.length; i++) {
+                if (dropzone.files.some(file => file.name === fetchedFiles[i].name)) {
+                    // Already in dropzone, skip
+                    continue;
+                }
                 const mockFile = {
                     name: fetchedFiles[i].name,
                     size: fetchedFiles[i].size,
+                    previewTemplate: fetchedFiles[i].previewTemplate || undefined,
                 };
                 // @ts-ignore need this to fix dropzone behavior
                 dropzone.files.push(mockFile);
                 dropzone.displayExistingFile(mockFile, logo);
             }
         }
-
-        return () => {
-            dropzone?.destroy();
-        };
-    }, [fetchedFiles]);
-
-    const onResetClick = () => {
-        if (!Cookies.get('access_token')) {
-            return;
-        }
-        
-        fetch(urlDeleteFiles, {
-            method: 'POST',
-            headers: {
-                Authorization: `Bearer ${Cookies.get('access_token')}`,
-            },
-        })
-        .then((response) => {
-            if (response.status === 200) {
-                setFetchedFiles([]);
-            }
-        })
-        .catch((error) => {
-            setStatus(errorStatus(error));
-        });
-    };
-
-    const onDisplayedDropzoneClick = (event: React.MouseEvent) => {
-        if (event.target !== rootRef.current) {
-            return;
-        }
-        setDisplayed?.(false);
-        console.log(displayed)
-    };
+    }, [fetchedFiles, dropzone]);
 
     return (
-        <div ref={rootRef} className={classNames(styles.root, className, !displayed && styles.hidden)} onClick={onDisplayedDropzoneClick}>
-            <button className={styles.resetButton} onClick={onResetClick}>Reset</button>
-            <div ref={dropzoneRef} className={classNames('dropzone', styles.dD)}>
-                <p className={styles.dDText}>
-                    Drag and drop your content here or click to upload
-                </p>
-            </div>
+        <div ref={dropzoneRef} className={classNames('dropzone', styles.dropzone, className)}>
+            <p className={classNames(styles.dropzoneText, fetchedFiles.length > 0 && styles.dropzoneTextHidden)}>
+                Drag and drop your content here or click to upload
+            </p>
         </div>
     );
 };
