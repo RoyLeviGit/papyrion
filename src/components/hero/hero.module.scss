@@ -1,3 +1,5 @@
+@import '../dropzone/dropzone.module';
+
 .hero {
     display: flex;
     flex-direction: column;
@@ -24,6 +26,13 @@
     color: #3f1432;
     font-family: 'Roboto', Helvetica;
     font-size: 24px;
+}
+
+.dropzoneWide {
+    @extend .dropzone;
+    flex-direction: row;
+    display: flex;
+    align-self: stretch;
 }
 
 @media (max-width: 767px) {

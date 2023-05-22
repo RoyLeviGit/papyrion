@@ -70,7 +70,7 @@ export const MultiChat = ({
     return (
         <div className={classNames(styles.root, className)}>
             <div ref={displayedDropzoneRef} className={classNames(styles.dropzoneArea, !dropzoneDisplayed && styles.hidden)} onClick={onDisplayedDropzoneClick}>
-                <button className={styles.resetButton} onClick={onResetClick}>Reset</button>
+                <button className={styles.resetButton} onClick={onResetClick}/>
                 <Dropzone
                     className={styles.dropzoneLong}
                     fetchedFiles={fetchedFiles}

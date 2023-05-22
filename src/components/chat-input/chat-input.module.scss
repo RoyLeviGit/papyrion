@@ -1,34 +1,68 @@
 .root {
     display: flex;
-    flex-direction: column;
-    width: 100%;
-    position: relative;
-    box-shadow: rgb(223, 222, 222) 0px 0px 6px 1px inset;
-    background-color: rgba(233, 233, 233, 0.25);  
+    flex-direction: row;
+    width: calc(100% - 20px);
+    padding: 8px;
+    margin: 5px;
+    align-self: center;
+    border: 8px solid;
+    border-color: #e0cfde80;
+    background-color: #e0cfde40;
+    border-radius: 16px;
 }
 
 .inputarea {
     resize: none;
     display: flex;
-    background-color: rgba(255, 255, 255, 0);
+    width: 100%;
+    background-color: transparent;
     font-family: 'Roboto', Helvetica;
     font-size: 18px;
     border: none;
     outline: none;
 }
+
 .uploadFileButton {
     display: none;
+    background-image: url(../../assets/add_files_icon.png);
+    height: 100%;
+    aspect-ratio: 4 / 3;
+    border: none;
+    background-color: transparent;
+    background-repeat: no-repeat;
+    background-position: 50% 50%;
+    background-size: contain;
+    background-attachment: scroll;
+
+    transition: all 0.3s;
+    &:hover {
+        transform: scale(1.1);
+    }
 }
 
 .sendMessageButton {
+    background-image: url(../../assets/send_icon.png);
+    height: 100%;
+    aspect-ratio: 4 / 3;
+    border: none;
+    background-color: transparent;
+    background-repeat: no-repeat;
+    background-position: 50% 50%;
+    background-size: contain;
+    background-attachment: scroll;
+
+    transition: all 0.3s;
+    &:hover {
+        transform: scale(1.1);
+    }
 }
 
 .ChatInputButtons {
     display: flex;
-    flex-direction: row;
-    position: absolute;
-    bottom: 0px;
-    right: 0px;
+    flex-direction: column;
+    width: 100%;
+    max-width: 42px;
+    margin: auto;
 }
 
 @media (max-width: 1250px) {

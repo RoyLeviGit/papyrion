@@ -1,20 +1,20 @@
 import Cookies from "js-cookie";
 
-// export const urlAuth = `${import.meta.env.VITE_API_URL}/auth`
-// export const urlRefresh = `${import.meta.env.VITE_API_URL}/refresh`
-// export const urlUploadFile = `${import.meta.env.VITE_API_URL}/upload`
-// export const urlListFiles = `${import.meta.env.VITE_API_URL}/list-files`
-// export const urlDeleteFiles = `${import.meta.env.VITE_API_URL}/delete-files`
-// export const urlQuestionDoc = `${import.meta.env.VITE_API_URL}/question_doc`
-// export const urlCompletion = `${import.meta.env.VITE_API_URL}/completion`
+export const urlAuth = `${import.meta.env.VITE_API_URL}/auth`
+export const urlRefresh = `${import.meta.env.VITE_API_URL}/refresh`
+export const urlUploadFile = `${import.meta.env.VITE_API_URL}/upload`
+export const urlListFiles = `${import.meta.env.VITE_API_URL}/list-files`
+export const urlDeleteFiles = `${import.meta.env.VITE_API_URL}/delete-files`
+export const urlQuestionDoc = `${import.meta.env.VITE_API_URL}/question_doc`
+export const urlCompletion = `${import.meta.env.VITE_API_URL}/completion`
 
-export const urlAuth = `/auth`
-export const urlRefresh = `/refresh`
-export const urlUploadFile = `/upload`
-export const urlListFiles = `/list-files`
-export const urlDeleteFiles = `/delete-files`
-export const urlQuestionDoc = `/question_doc`
-export const urlCompletion = `/completion`
+// export const urlAuth = `/auth`
+// export const urlRefresh = `/refresh`
+// export const urlUploadFile = `/upload`
+// export const urlListFiles = `/list-files`
+// export const urlDeleteFiles = `/delete-files`
+// export const urlQuestionDoc = `/question_doc`
+// export const urlCompletion = `/completion`
 
 export const getNewToken = async (
     handleSuccess: () => void,

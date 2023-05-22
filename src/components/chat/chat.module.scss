@@ -1,17 +1,17 @@
 .root {
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  height: 100%;
-  width: 100%;
-  max-width: 900px;
-  margin: auto;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 100%;
+    width: 100%;
+    max-width: 900px;
+    margin: auto;
 }
 
 .formatedTextArea {
-  width: 100%;
-  overflow: auto;
-  display: flex;
-  flex-direction: column;
-  height: 100%;
+    width: 100%;
+    overflow: auto;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
 }

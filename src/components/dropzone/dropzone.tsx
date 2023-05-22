@@ -8,7 +8,7 @@ import { errorStatus } from '../../App'
 
 import classNames from 'classnames';
 import styles from './dropzone.module.scss';
-import { urlDeleteFiles, urlListFiles, urlUploadFile } from '../../api/api';
+import { urlListFiles, urlUploadFile } from '../../api/api';
 
 export interface DropzoneProps {
     className?: string;
@@ -67,13 +67,16 @@ export const Dropzone = ({
 
     // Dropzone initialization
     useEffect(() => {
-        if (!dropzoneRef.current) { //|| !Cookies.get('access_token')) {
+        if (!dropzoneRef.current || !Cookies.get('access_token')) {
             return;
         }
 
-        // Dz.autoDiscover = false;
-        setDropzone(() => {
-            if (!dropzoneRef.current) { //|| !Cookies.get('access_token')) {
+        Dz.autoDiscover = false;
+        setDropzone((oldDropzone) => {
+            if (oldDropzone) {
+                oldDropzone.destroy();
+            }
+            if (!dropzoneRef.current || !Cookies.get('access_token')) {
                 return undefined;
             }
 
@@ -135,6 +138,9 @@ export const Dropzone = ({
                 dropzone.files.push(mockFile);
                 dropzone.displayExistingFile(mockFile, logo);
             }
+        } else if (dropzone &&fetchedFiles.length === 0) {
+            console.log("Clearing files to display")
+            dropzone.removeAllFiles();
         }
     }, [fetchedFiles, dropzone]);
 

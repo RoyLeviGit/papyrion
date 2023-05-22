@@ -13,7 +13,12 @@ export interface ChatInputProps {
     setDropzoneDisplayed: Dispatch<SetStateAction<boolean>>;
 }
 
-export const ChatInput = ({ className, setChatMessages, setFillAiMessages, setDropzoneDisplayed }: ChatInputProps) => {
+export const ChatInput = ({
+    className,
+    setChatMessages,
+    setFillAiMessages,
+    setDropzoneDisplayed,
+}: ChatInputProps) => {
     const [message, setMessage] = useState('');
 
     const handleMessageChange = (event: any) => {
@@ -57,7 +62,7 @@ export const ChatInput = ({ className, setChatMessages, setFillAiMessages, setDr
         <div className={classNames(styles.root, className)}>
             <TextareaAutosize
                 className={styles.inputarea}
-                minRows={2}
+                minRows={3}
                 maxRows={5}
                 value={message}
                 onChange={handleMessageChange}
@@ -67,12 +72,11 @@ export const ChatInput = ({ className, setChatMessages, setFillAiMessages, setDr
                 }
             ></TextareaAutosize>
             <div className={styles.ChatInputButtons}>
-                <button onClick={() => setDropzoneDisplayed(true)} className={styles.uploadFileButton}>
-                    📜
-                </button>
-                <button onClick={handleSendMessage} className={styles.sendMessageButton}>
-                    ✅
-                </button>
+                <button
+                    onClick={() => setDropzoneDisplayed((prevVal) => !prevVal)}
+                    className={styles.uploadFileButton}
+                />
+                <button onClick={handleSendMessage} className={styles.sendMessageButton}/>
             </div>
         </div>
     );
