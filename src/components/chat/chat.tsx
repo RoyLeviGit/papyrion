@@ -1,4 +1,4 @@
-import { Dispatch, SetStateAction } from 'react';
+import { Dispatch, SetStateAction, useEffect, useRef } from 'react';
 import classNames from 'classnames';
 import styles from './chat.module.scss';
 import { ChatInput } from '../chat-input/chat-input';
@@ -20,6 +20,8 @@ export interface ChatProps {
 }
 
 export const Chat = ({ className, chatMessages, setChatMessages, setFillAiMessages, setDropzoneDisplayed }: ChatProps) => {
+    const chatRef = useRef<HTMLDivElement>(null);
+
     // String together chat messages
     const formattedChatMessages = chatMessages?.map((message) => {
         return (
@@ -27,9 +29,22 @@ export const Chat = ({ className, chatMessages, setChatMessages, setFillAiMessag
         );
     });
 
+    useEffect(() => {
+        const { current } = chatRef;
+        if (!current) {
+            return;
+        }
+
+        const shouldScroll = current.scrollHeight - current.scrollTop <= current.clientHeight + 100;
+
+        if (shouldScroll) {
+            current.scrollTop = current.scrollHeight;
+        }
+    }, [chatMessages]);
+
     return (
         <div className={classNames(styles.root, className)}>
-            <div className={styles.formatedTextArea}>{formattedChatMessages}</div>
+            <div ref={chatRef} className={styles.formatedTextArea}>{formattedChatMessages}</div>
             <ChatInput setChatMessages={setChatMessages} setFillAiMessages={setFillAiMessages} setDropzoneDisplayed={setDropzoneDisplayed}/>
         </div>
     );
