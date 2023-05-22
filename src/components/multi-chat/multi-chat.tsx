@@ -64,7 +64,6 @@ export const MultiChat = ({
             return;
         }
         setDropzoneDisplayed?.(false);
-        console.log(dropzoneDisplayed)
     };
 
     return (

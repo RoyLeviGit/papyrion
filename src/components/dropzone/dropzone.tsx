@@ -65,13 +65,8 @@ export const Dropzone = ({
         });
     }, []);
 
-    // Dropzone initialization
-    useEffect(() => {
-        if (!dropzoneRef.current || !Cookies.get('access_token')) {
-            return;
-        }
-
-        Dz.autoDiscover = false;
+    // New Dropzone
+    const newDropzone = () => {
         setDropzone((oldDropzone) => {
             if (oldDropzone) {
                 oldDropzone.destroy();
@@ -116,6 +111,16 @@ export const Dropzone = ({
             });
             return dz
         });
+    }
+
+    // Dropzone initialization
+    useEffect(() => {
+        if (!dropzoneRef.current || !Cookies.get('access_token')) {
+            return;
+        }
+
+        Dz.autoDiscover = false;
+        newDropzone();
 
         return () => {
             dropzone?.destroy();
@@ -123,7 +128,9 @@ export const Dropzone = ({
     }, []);
 
     useEffect(() => {
-        if (dropzone && fetchedFiles) {
+        if (dropzone && fetchedFiles.length === 0) {
+            dropzone.removeAllFiles(true);
+        } else if (dropzone && fetchedFiles) {
             for (let i = 0; i < fetchedFiles.length; i++) {
                 if (dropzone.files.some(file => file.name === fetchedFiles[i].name)) {
                     // Already in dropzone, skip
@@ -132,17 +139,14 @@ export const Dropzone = ({
                 const mockFile = {
                     name: fetchedFiles[i].name,
                     size: fetchedFiles[i].size,
-                    previewTemplate: fetchedFiles[i].previewTemplate || undefined,
+                    previewElement: fetchedFiles[i].previewElement || undefined,
                 };
+                dropzone.displayExistingFile(mockFile, logo);
                 // @ts-ignore need this to fix dropzone behavior
                 dropzone.files.push(mockFile);
-                dropzone.displayExistingFile(mockFile, logo);
             }
-        } else if (dropzone &&fetchedFiles.length === 0) {
-            console.log("Clearing files to display")
-            dropzone.removeAllFiles();
-        }
-    }, [fetchedFiles, dropzone]);
+        } 
+    }, [fetchedFiles]);
 
     return (
         <div ref={dropzoneRef} className={classNames('dropzone', styles.dropzone, className)}>
