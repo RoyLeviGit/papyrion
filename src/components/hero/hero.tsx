@@ -10,9 +10,10 @@ export interface HeroProps {
     fetchedFiles: DropzoneMockFile[];
     setFetchedFiles: Dispatch<SetStateAction<DropzoneMockFile[]>>;
     setStatus: Dispatch<SetStateAction<{ status: string; description: string }>>;
+    scrollScreen: () => void;
 }
 
-function Hero({ dropzoneKey, fetchedFiles, setFetchedFiles, setStatus }: HeroProps) {
+function Hero({ dropzoneKey, fetchedFiles, setFetchedFiles, setStatus, scrollScreen }: HeroProps) {
     return (
         <div className={classNames('hero', styles.hero)}>
             <div className={classNames(styles.titles, styles.titles)}>
@@ -29,6 +30,7 @@ function Hero({ dropzoneKey, fetchedFiles, setFetchedFiles, setStatus }: HeroPro
                     setStatus={setStatus}
                     fetchedFiles={fetchedFiles}
                     setFetchedFiles={setFetchedFiles}
+                    scrollScreen={scrollScreen}
             />
         </div>
     );

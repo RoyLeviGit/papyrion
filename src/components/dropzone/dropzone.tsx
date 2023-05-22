@@ -17,6 +17,7 @@ export interface DropzoneProps {
     selectedFile?: string;
     setSelectedFile?: (value: string) => void;
     setStatus: Dispatch<SetStateAction<{ status: string; description: string; }>>;
+    scrollScreen?: () => void;
 }
 
 export const Dropzone = ({ 
@@ -25,7 +26,8 @@ export const Dropzone = ({
     setFetchedFiles,
     selectedFile, 
     setSelectedFile,
-    setStatus
+    setStatus,
+    scrollScreen,
 }: DropzoneProps) => {
     const dropzoneRef = useRef<HTMLDivElement>(null);
     const [dropzone, setDropzone] = useState<Dropzone | undefined>(undefined);
@@ -108,6 +110,7 @@ export const Dropzone = ({
                     // Setting to file name as saved by the server
                     setSelectedFile?.(response.document_id);
                 });
+                scrollScreen?.();
             });
             return dz
         });

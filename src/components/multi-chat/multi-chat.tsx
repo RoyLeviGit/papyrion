@@ -1,4 +1,4 @@
-import { Dispatch, SetStateAction, useRef, useState } from 'react';
+import { Dispatch, RefObject, SetStateAction, forwardRef, useRef, useState } from 'react';
 import classNames from 'classnames';
 import styles from './multi-chat.module.scss';
 import { Chat, ChatMessage } from '../chat/chat';
@@ -9,6 +9,7 @@ import { errorStatus } from '../../App';
 import { DropzoneMockFile } from 'dropzone';
 
 export interface MultiChatProps {
+    ref: RefObject<HTMLDivElement>;
     className?: string;
     dropzoneKey?: number;
     fetchedFiles: DropzoneMockFile[];
@@ -21,7 +22,7 @@ export interface MultiChatProps {
     setFillAiMessages: Dispatch<SetStateAction<string[]>>;
 };
 
-export const MultiChat = ({
+export const MultiChat = forwardRef<HTMLDivElement, MultiChatProps>(({
     className,
     dropzoneKey,
     fetchedFiles,
@@ -32,7 +33,7 @@ export const MultiChat = ({
     chatMessages,
     setChatMessages,
     setFillAiMessages,
-}: MultiChatProps) => {
+}: MultiChatProps, ref) => {
     const [dropzoneDisplayed, setDropzoneDisplayed] = useState(false);
     const displayedDropzoneRef = useRef<HTMLDivElement>(null);
 
@@ -67,7 +68,7 @@ export const MultiChat = ({
     };
 
     return (
-        <div className={classNames(styles.root, className)}>
+        <div ref={ref} className={classNames(styles.root, className)}>
             <div ref={displayedDropzoneRef} className={classNames(styles.dropzoneArea, !dropzoneDisplayed && styles.hidden)} onClick={onDisplayedDropzoneClick}>
                 <button className={styles.resetButton} onClick={onResetClick}/>
                 <Dropzone
@@ -88,4 +89,4 @@ export const MultiChat = ({
             />
         </div>
     );
-};
+});

@@ -59,10 +59,10 @@ console.log(square(5)); // Output: 25asdkljfaskljdhfakjsldh25asdkljfaskljdhf25as
 Some more text: 25asdkljfaskljdhfakjsldh25asdkljfaskljdhf25asdkljfaskljdhfakjsldhfkljasakjsldhfkljasfkljas25asdkljfaskljdhfakjsldh25asdkljfaskljdhf25asdkljfaskljdhfakjsldhfkljasakjsldhfkljasfkljas
 `;
 
-console.log(message);
-
 
 function App() {
+    const multiChatRef = useRef<HTMLDivElement>(null);
+
     const [emptyTopHeight, setEmptyTopHeight] = useState<number>(0);
     const [emptyMidHeight, setEmptyMidHeight] = useState<number>(0);
     const [status, setStatus] = useState(idleStatus);
@@ -235,13 +235,19 @@ function App() {
             return updatedMessages;
         });
     }, [selectedFile]);
-    
+
+    const scrollScreen = () => {
+        // Scroll into multiChat
+        if (multiChatRef.current) {
+            multiChatRef.current.scrollIntoView({behavior: "smooth"});
+        }
+    }    
     return (
         <div className={styles.App}>
             <div style={{minHeight: emptyTopHeight}}/>
-            <Hero dropzoneKey={dropzoneKey} fetchedFiles={fetchedFiles} setFetchedFiles={setFetchedFiles} setStatus={setStatus}/>
+            <Hero dropzoneKey={dropzoneKey} fetchedFiles={fetchedFiles} setFetchedFiles={setFetchedFiles} setStatus={setStatus} scrollScreen={scrollScreen}/>
             <div style={{minHeight: emptyMidHeight}}/>
-            <MultiChat chatMessages={chatMessages} setChatMessages={setChatMessages} setFillAiMessages={setFillAiMessages} selectedFile={selectedFile} setSelectedFile={setSelectedFile} setStatus={setStatus} dropzoneKey={dropzoneKey + 1} fetchedFiles={fetchedFiles} setFetchedFiles={setFetchedFiles}/>
+            <MultiChat ref={multiChatRef} chatMessages={chatMessages} setChatMessages={setChatMessages} setFillAiMessages={setFillAiMessages} selectedFile={selectedFile} setSelectedFile={setSelectedFile} setStatus={setStatus} dropzoneKey={dropzoneKey + 1} fetchedFiles={fetchedFiles} setFetchedFiles={setFetchedFiles}/>
             <StatusBar status={status.description} />
             <Analytics />
         </div>
