@@ -110,7 +110,7 @@ export const Dropzone = ({
                     // Setting to file name as saved by the server
                     setSelectedFile?.(response.document_id);
                 });
-                scrollScreen?.();
+                scrollScreen?.(); // TODO: scroll only when finished uploading all files
             });
             return dz
         });
@@ -142,7 +142,7 @@ export const Dropzone = ({
                 const mockFile = {
                     name: fetchedFiles[i].name,
                     size: fetchedFiles[i].size,
-                    previewElement: fetchedFiles[i].previewElement || undefined,
+                    previewElement: fetchedFiles[i].previewElement || undefined, // TODO: transfer thumbnail between dropzones
                 };
                 dropzone.displayExistingFile(mockFile, logo);
                 // @ts-ignore need this to fix dropzone behavior
