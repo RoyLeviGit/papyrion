@@ -3,6 +3,8 @@
     <h1><img height="30" src="./src/assets/logo.png"> Papyrion</h1>
 </div>
 
+Hosted at https://papyrion.vercel.app/
+
 ### Available Scripts
 
 In the project directory, you can run:
